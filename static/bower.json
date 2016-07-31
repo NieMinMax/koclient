@@ -1,0 +1,29 @@
+{
+    "name": "kochinese",
+    "version": "0.9",
+    "authors": [],
+    "moduleType": [
+	"es6"
+    ],
+    "license": "",
+    "private": true,
+    "ignore": [
+	"**/.*",
+	"node_modules",
+	"bower_components",
+	"test",
+	"tests"
+    ],
+    "dependencies": {
+	"angular": "~1.4.6",
+	"angular-animate": "~1.4.0",
+	"angular-bootstrap": "~0.13.0",
+	"angular-local-storage": "~0.2.0",
+	"angular-smart-table": "~2.1.0",
+	"angular-ui-select": "~0.12.0",
+	"animate.css": "~3.2.0",
+	"bootstrap": "~3.3.0",
+	"angular-locale_zh-cn": "*",
+	"angular-messages": "~1.4.6"
+    }
+}

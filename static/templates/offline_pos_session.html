@@ -1,0 +1,173 @@
+<div ng-controller="ServiceSessionCtrl">
+
+    <div class="kokanban" ng-if="show.base">  
+	<div class="kocard col-xs-5 text-center">
+	    <div class="panel panel-info">
+		<div class="panel-body"  style="line-height:150%">
+		  <button class="btn btn-info" ng-click="actionStart()">新建点餐任务</button>
+		  <div class="text-left ">
+		    <ol>
+		      <li>离线收银仅用于无网络环境时应急使用，其功能非常有限，请勿过份依赖此功能．</li>
+		      <li>采用在线模式收银,系统会自动下载商品，品类等信息，无需人工设置.</li>
+		      <li>当网络恢复时,请及时将数据上传到系统中，以便您统计与决策.</li>
+		    </ol>
+		  </div>
+		</div>
+	    </div>
+	</div>
+	<div class="kocard col-xs-5 text-center" ng-repeat="session in sessions | orderBy:'-start_date'">
+	    <div class="panel panel-info">
+		<div class="panel-body" style="line-height:2;font-size:1.6rem">
+		    <div class="col-xs-offset-1 text-left">时间: {{session.start_date |  date:'yyyy-MM-dd HH:mm:ss'}}</div>
+		    <div class="col-xs-offset-1 text-left">备用金: {{session.cash_start |  currency:'￥'}}</div>
+		    <div class="col-xs-offset-1 text-left">
+			{{session.note}}
+		    </div>
+		    <br/>
+		    <button class="btn btn-info" ng-if="!session.has_finish" ng-click="actionNote(session.id)">备 注</button> 
+		    <button class="btn btn-info" ng-if="!session.has_finish" ng-click="actionDo(session.id)">继 续</button>
+		    <button class="btn btn-warning" ng-click="actionEnd(session.id)">
+		      <span ng-if="!session.has_finish">交 班</span>
+		      <span ng-if="session.has_finish">查 看</span>
+		    </button>
+		    <button class="btn btn-warning" ng-click="actionOnline(session)">上传</button>
+		    <div ng-if="session.show" class="captcha">
+			<div class="input-group add-margin">
+			    <span class="input-group-addon" id="company">餐厅代码</span>
+			    <input type="text" class="form-control" ng-model="online.company" required/>
+			</div>
+			<div class="input-group add-margin">
+			    <span class="input-group-addon" id="user">用户名</span>
+			    <input type="text" class="form-control" ng-model="online.user" required/>
+			</div>
+			<div class="input-group add-margin">
+			    <span class="input-group-addon" id="password">密码</span>
+			    <input type="password" class="form-control" ng-model="online.pwd" required/>
+			</div>
+			<button class="btn btn-info" ng-click="actionOnlineOK(session)">确认上传</button>
+			<button class="btn btn-info" ng-click="actionOnlineCancel(session)">暂不上传</button>
+			<div ng-if="session.uploading">正在上传，请稍等...</div>
+		    </div>
+
+		</div>
+	    </div>
+	</div>
+    </div>
+
+    <div ng-if="show.end" class="end">
+
+	<div id="data-print">
+	    <div>
+		<h3 class="control-label text-center"><b>{{company_info.short_name}}交班报表</b></h3>
+		<table class="table">
+		    <tbody>
+			<tr>
+			    <td>营业时间</td>
+			    <td>{{pos_info.start_date | date:"yyyy-MM-dd hh:mm:ss"}}</td>
+			</tr>
+
+			<tr>
+			    <td>结束时间</td>
+			    <td></td>
+			</tr>
+			<tr>
+			    <td>备用金</td>
+			    <td>{{pos_info.cash_start |currency:'￥'}}</td>
+			</tr>
+			<tr>
+			    <td>交易次数</td>
+			    <td>{{order_count}}</td>
+			</tr>
+			<tr>
+			    <td>客单价</td>
+			    <td>{{amount/order_count | currency:'￥'}}</td>
+			</tr>
+			<tr>
+			  <td>退款次数</td>
+			  <td>{{return_count}}</td>
+			</tr>
+			<tr>
+			    <td>销售金额</td>
+			    <td>{{amount | currency:'￥'}}</td>
+			</tr>
+			<tr>
+			    <td>退款金额</td>
+			    <td>{{-return_amount | currency:'￥'}}</td>
+			</tr>
+			<tr>
+			    <td>实际金额</td>
+			    <td>{{amount+return_amount| currency:'￥'}}</td>
+			</tr>
+		    </tbody>
+		</table>
+
+		<h4 class="control-label"><b>收款详情</b></h3>
+		<table class="table table">
+		    <thead>
+			<tr>
+			    <th>类型</th>
+			    <th>金额</th>
+			</tr>
+		    </thead>
+		    <tbody>
+			<tr ng-repeat="(one_money, qty) in utotalPays">
+			    <td> {{one_money | pay_type}} </td>
+			    <td> {{qty | currency:"￥"}}</td>
+			</tr>
+		    </tbody>
+		</table>
+
+	    </div>
+	    <br/>
+	    <div class="form-group" >
+		<label class="control-label" for="inputMoney">交班现金</label>
+		<input type="number" class="form-control" id="inputMoney" ng-model="pos_info.cash_end" ng-disabled="pos_info.has_finish"/>
+	    </div>
+	    <br/>
+	    <div>
+	    <div class="text-center">
+	      <button class="btn btn-primary"  ng-if="!pos_info.has_finish" ng-click="actionOkEnd(pos_info.id, manager)">交班</button>
+	      <button class="btn btn-primary" ng-print print-element-id="data-print">打印</button>
+	      <button class="btn btn-warning" ng-click="actionCancelEnd()">关闭</button>
+	    </div>
+	</div>
+
+    </div>
+
+
+    <script type="text/ng-template" id="action_start.html">
+	<div class="modal-header">
+	    <h3 class="modal-title">备用金金额</h3>
+	</div>
+	<div class="modal-body">
+	    <form role="form" name="payForm">
+		<input type="number" class="form-control" ng-model="cash.qty"/>
+	    </form>
+	</div>
+
+	<div class="modal-footer">
+	    <button class="btn btn-primary" ng-click="ok()">确认</button>
+	    <button class="btn btn-warning" ng-click="cancel()">取消</button>
+	</div>
+    </script>
+
+
+    <script type="text/ng-template" id="action_note.html">
+	<div class="modal-header">
+	    <h3 class="modal-title">备注信息</h3>
+	</div>
+	<div class="modal-body">
+	    <form role="form">
+		<div class="form-group">
+		    <textarea type="text" class="form-control" id="inputNote"  ng-model="p.note" style="height:8rem;">
+		    </textarea>
+		</div>
+	    </form>
+	</div>
+	<div class="modal-footer">
+	    <button class="btn btn-primary" ng-click="ok()">添加</button>
+	    <button class="btn btn-warning" ng-click="cancel()">取消</button>
+	</div>
+    </script>
+
+</div>

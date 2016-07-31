@@ -1,0 +1,418 @@
+// 颜色定义
+@bodycolor:#333;
+@bgcolor:#fff;
+@wkcolor:#f8f8ff;
+
+@defaultcolor: #333;
+@primarycolor: #428bca;
+@successcolor:#5cb85c;
+@infocolor:#5bc0de;
+@warningcolor:#f0ad4e;
+@dangercolor:#d9534f;
+
+@posopcolor:#73cff1;
+@posshowcolor:#c9f1ff;
+
+.btn{
+    border-radius: 0 !important;
+}
+.form-control {
+    border-radius: 0 !important;
+}
+.dropdown-menu {
+    border-radius: 0 !important;
+}
+.alert {
+    border-radius: 0 !important;
+    clear:both;
+    text-align:center;
+    font-weight:bold;
+}
+.modal-content {
+    border-radius: 0 !important;
+}
+.panel {
+    border-radius: 0 !important;
+}
+
+.basic-padding {
+    padding:0.5rem 1rem;
+}
+
+.basic-margin {
+    margin:0.5rem 1rem;
+}
+
+// 边界定义
+.bordered {
+    border-top: dotted 1px black;
+    border-bottom: solid 2px black;
+}
+
+body {
+    background-color: @bgcolor;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.2em;
+    margin: 15px 0;
+}
+
+h1, p {
+    color: @bodycolor;
+}
+
+a {
+    text-decoration:none !important;
+    color:@bodycolor !important
+}
+
+.base {
+    margin-top:15rem;
+}
+
+.printer {
+    font-size:1.6rem;
+    line-height:200%;
+    padding:1rem 5rem;
+    .part {
+	padding:0.5rem 0;
+    }
+}
+
+.table {
+    margin-top:1rem;
+    margin-bottom:1rem;
+}
+
+.pcateg {
+    position:fixed;
+    top:12rem;
+    width:7rem;
+    z-index:auto;
+    text-align:center;
+    margin:5rem 0.4rem 3rem 0;
+    background-color:@wkcolor;
+    button {
+	border:none;
+    	padding:0.5rem 0.8rem;
+    	margin:0.5rem 0;
+    }
+}
+
+.product {
+    margin:1rem 0.4rem 3rem 8rem;
+    text-align:center;
+    .no-product {
+	font-size:2rem;
+	font-weight:bold;
+	margin-top:3rem;
+    }
+    .table-title {
+	text-align:center;
+	font-size:2.5rem;
+	margin:1.5rem 0;
+    }
+}
+
+.kopname {
+    text-align:center;
+}
+
+.kocontent {
+    text-align:center;
+}
+
+
+.tmoney{
+    text-align:right;
+    font-size:1.5rem;
+    font-weight:bold;
+    button {
+	margin-top:1rem;
+	margin-right:1.5rem;
+    }
+}
+
+.oldprice{
+    margin-left:0.5rem;
+    color:red;
+    text-decoration:underline;
+}
+
+
+.kofooter {
+    height:2rem;
+    text-align:center;
+    width:100%;
+    z-index: 100;
+    background-color:black;
+}
+
+.order{
+    margin-top:1rem;
+}
+
+.order-sum {
+    font-size:1.6rem;
+    font-weight:bold;
+    text-align:center;
+    padding:1.5rem 0;
+}
+
+.modal-body {
+    div {
+	padding:0.5rem 0;
+    }
+    .product-detail {
+	img { 
+	    max-width:100%;
+	    text-align:center;
+	}
+	div {
+	    text-align:center;
+	}
+    }
+}
+
+.kotable {
+    text-align:center;
+    font-size:1.8rem;
+    font-weight:bold;
+    margin:1.5rem 0.5rem;
+}
+
+
+.kocart {
+    text-align:center;
+    top:4rem;
+    z-index: 10;
+}
+
+.kokanban{
+    margin:2 auto;
+}
+
+.pos {
+    .op{
+	width:30%;
+	.op-pool {
+	    padding:0.8rem 0;
+	    margin-bottom:0.7rem;
+	    text-align:center;
+	    background-color:@warningcolor;
+	    button {
+		margin:1px 0;
+		border:solid 0.1rem @bgcolor !important;
+	    }
+	}
+	.op-cart {
+	    padding:2.5rem 0;
+	    background-color:#eee;
+	    height:30rem;
+	    overflow-y:scroll;
+	    .product{
+		font-size:6px !important;
+		width:70%;
+	    }
+	    .tmoney {
+		padding-bottom:1rem;
+		font-size:1.6rem;
+		text-align:center;
+	    }
+	    .tmark {
+		padding-bottom:1rem;
+		text-align:left;
+		font-size:1.4rem;
+		line-height:180%;
+		color:red;
+	    }
+	}
+	.op-type {
+	    text-align:center;
+	    padding:0.8rem 0;
+	    margin:0.6rem 0;
+	    background-color:@warningcolor;
+	    button {
+		margin:1px 0;
+		border:solid 0.1rem @bgcolor !important;
+	    }
+	}
+	.op-pay {
+	    padding:0.8rem 0;
+	    text-align:left;
+	    background-color:@warningcolor;
+	    button {
+		margin:1px 0;
+		border:solid 0.1rem @bgcolor !important;
+	    }
+	}
+    }
+    .show {
+	width:69%;
+	.show-categ {
+	    padding:0.8rem 0;
+	    margin-bottom:0.7rem;
+	    background-color:@successcolor;
+	}
+	.show-product {
+	    line-height:600%;
+	    background-color:@infocolor;
+	    margin:0.6rem 0;
+	    text-align:left;
+	    .no-product {
+		font-size:5rem;
+		font-weight:bold;
+		color:white;
+		padding:8rem 0;
+	    }
+	    button {
+		width:32%;
+		height:6rem;
+		border:solid 0.1rem @bgcolor !important;
+		margin:1px 0;
+	    }
+	}
+	.show-flavour{
+	    padding:0.8rem 0;
+	    margin-top:0.6rem;
+	    position:fixed;
+	    bottom:2.8rem;
+	    width:66%;
+	    background-color:@infocolor;
+	}
+
+	.show-pool {
+	    .close-pool { 
+		text-align:center;
+	    }
+	    .table {
+		margin-bottom:2rem;
+	    }
+	}
+	.show-sold {
+	    .op-sold { 
+		text-align:center;
+	    }
+	    .table {
+		margin:1rem 0;
+	    }
+	}
+	.show-mark {
+	    margin-top:6rem;
+	    text-align:center;
+	    input {
+		margin-bottom:1rem;
+	    }
+	}
+	.show-order-table {
+	    margin-top:6rem;
+	    text-align:center;
+	}
+	.show-order-out {
+	    text-align:center;
+	    margin:6rem 0;
+	    .question {
+		font-size:2rem;
+		margin:1.6rem;
+	    }
+	}
+	.show-order-address{
+	    text-align:center;
+	    margin:5rem 0;
+	    font-size:2rem;
+	}
+	.show-order-renew {
+	    text-align:center;
+	    margin:6rem 0;
+	    .question {
+		font-size:2rem;
+		margin:1.6rem;
+	    }
+	}
+	.show-order-waste {
+	    text-align:center;
+	    margin:6rem 0;
+	    .question {
+		font-size:2rem;
+		margin:1.6rem;
+	    }
+	}
+	.show-order-myeat {
+	    text-align:center;
+	    margin:6rem 0;
+	    .question {
+		font-size:2rem;
+		margin:1.6rem;
+	    }
+	}
+	.show-discount {
+	    text-align:center;
+	    margin-top:6rem;
+	    input {
+		margin-bottom:1rem;
+	    }
+	}
+
+	.show-pay {
+	    text-align:center;
+	    margin-top:5rem;
+	    .order-total {
+		font-size:2.2rem;
+		font-weight:bold;
+		line-height:180%;
+		color:@successcolor;
+		.money-extra {
+		    color:@warningcolor;
+		}
+	    }
+	    .show-pay-skip {
+		margin-top:2rem;
+		text-align:center;
+		.question {
+		    font-size:2rem;
+		    margin:1.6rem;
+		}
+	    }
+	    .show-pay-coupon {
+		text-align:center;
+		input {
+		    margin-bottom:1rem;
+		}
+	    }
+	    .show-pay-cash {
+		text-align:center;
+		input {
+		    margin-bottom:1rem;
+		}
+	    }
+	    .show-pay-card {
+		text-align:center;
+		input {
+		    margin-bottom:1rem;
+		}
+	    }
+	    .show-pay-mypay {
+		text-align:center;
+		input {
+		    margin-bottom:1rem;
+		}
+	    }
+	    .show-pay-own {
+		text-align:center;
+		input {
+		    margin-bottom:1rem;
+		}
+	    }
+	    .show-pay-gift {
+		text-align:center;
+		input {
+		    margin-bottom:1rem;
+		}
+	    }
+
+
+	}
+
+    }
+}

@@ -1,0 +1,30 @@
+/* Onscreen Keyboard http://net.tutsplus.com/tutorials/javascript-ajax/creating-a-keyboard-with-css-and-jquery/ */
+
+.pos .numpad button:active{
+    border: none;
+    color: white;
+    background: #7f82ac;
+}
+
+/*  ********* The Numpad ********* */
+
+.pos .numpad {
+    padding: 8px 8px 8px 4px;
+    display: inline-block;
+    text-align: center;
+}
+.pos .numpad button {
+    height: 80px;
+    width: 80px;
+    margin: 0px 0px 4px 0px;
+    font-weight: bold;
+    vertical-align: middle;
+    color: #555555;
+}
+.pos .input-button {
+    font-size: 24px;
+}
+.pos .mode-button {
+    font-size: 14px;
+}
+

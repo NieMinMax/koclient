@@ -1,0 +1,87 @@
+disabled()
+  bg-grey(200)
+  text-grey(400)
+  depth(0)
+  &:hover
+    background-color:none
+    text-grey(400)
+    bg-grey(200)
+    depth(0)
+  &:active
+    depth(0)
+
+button()
+  padding:10px 20px
+  border-radius:2px
+  text-transform:uppercase
+  width:auto
+  transition:all .2s ease
+  inline()
+  depth(1)
+  &:not(.waves-effect)
+    &:hover
+      bg-cyan(700)
+      depth(1)
+    &:active
+      depth(2)
+    &.disabled
+      disabled()
+input[type=submit]
+  -webkit-appearance:none
+  border:0
+  font-style:normal
+  -webkit-font-smoothing: antialiased
+  button()
+  &:focus
+    outline:0
+  &.flat
+    background-color:transparent
+  // &:hover
+  //   color:darken(#fff, 10%)
+  &.disabled,
+  &:disabled
+    disabled()
+.button
+  button()
+  &.flat
+    background:none
+    depth(0)
+    &:hover
+      bg-cyan(300)
+      depth(0)
+      text-white()
+    &:active
+      depth(0)
+    &.disabled
+      disabled()
+    &.waves-effect
+      &:hover
+        background:none
+        text-cyan()
+  &.text
+    background:none
+    padding:0 20px 0 0
+    font-weight:bold
+    depth(0)
+    &:hover
+      background:none
+      color:$link-hover-color
+      depth(0)
+    &:active
+      depth(0)
+    &.disabled
+      background:none
+      &:hover
+        text-grey(400)
+a
+  &.button
+    &:hover,
+    &:focus
+      text-decoration:none
+i
+ &.waves-effect
+   
+  &:hover
+    input[type=submit]
+      background:none
+      text-cyan()

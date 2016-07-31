@@ -1,0 +1,171 @@
+get-red(s = false)
+  if s == 50
+    rgba(#fde0dc)
+  else if s == 100
+    rgba(#f9bdbb)
+  else if s == 200
+    rgba(#f69988)
+  else if s == 300
+    rgba(#f36c60)
+  else if s == 400
+    rgba(#e84e40)
+  else if s == 500
+    rgba(#e51c23)
+  else if s == 600
+    rgba(#dd191d)
+  else if s == 700
+    rgba(#d01716)
+  else if s == 800
+    rgba(#c41411)
+  else if s == 900
+    rgba(#b0120a)
+  else if s == 1000
+    rgba(#ff7997)
+  else if s == 1100
+    rgba(#ff5177)
+  else if s == 1200
+    rgba(#ff2d6f)
+  else if s == 1300
+    rgba(#e00032)
+  else 
+    rgba(#e51c23)
+bg-red(s = false)
+  background-color:get-red(s)
+text-red(s = false)
+  color:get-red(s)
+  &:hover
+    color:get-red(s)
+border-red(s = false)
+  border-color:get-red(s)
+.bg-red
+  bg-red()
+  .bg-minus-1,
+  &.bg-minus-1
+    bg-red(400)
+  .bg-minus-2,
+  &.bg-minus-2
+    bg-red(300)
+  .bg-minus-3,
+  &.bg-minus-3
+    bg-red(200)
+  .bg-minus-4,
+  &.bg-minus-4
+    bg-red(100)
+  .bg-minus-5,
+  &.bg-minus-5
+    bg-red(50)
+  .bg-plus-1,
+  &.bg-plus-1
+    bg-red(600)
+  .bg-plus-2,
+  &.bg-plus-2
+    bg-red(700)
+  .bg-plus-3,
+  &.bg-plus-3
+    bg-red(800)
+  .bg-plus-4,
+  &.bg-plus-4
+    bg-red(900)
+  .bg-accent-1,
+  &.bg-accent-1
+    bg-red(1000)
+  .bg-accent-2,
+  &.bg-accent-2
+    bg-red(1100)
+  .bg-accent-3,
+  &.bg-accent-3
+    bg-red(1200)
+  .bg-accent-4,
+  &.bg-accent-4
+    bg-red(1300)
+  .bg-base,
+  &.bg-base
+    bg-red(500)
+.text-red
+  text-red()
+  .text-minus-1,
+  &.text-minus-1
+    text-red(400)
+  .text-minus-2,
+  &.text-minus-2
+    text-red(300)
+  .text-minus-3,
+  &.text-minus-3
+    text-red(200)
+  .text-minus-4,
+  &.text-minus-4
+    text-red(100)
+  .text-minus-5,
+  &.text-minus-5
+    text-red(50)
+  .text-plus-1,
+  &.text-plus-1
+    text-red(600)
+  .text-plus-2,
+  &.text-plus-2
+    text-red(700)
+  .text-plus-3,
+  &.text-plus-3
+    text-red(800)
+  .text-plus-4,
+  &.text-plus-4
+    text-red(900)
+  .text-accent-1,
+  &.text-accent-1
+    text-red(1000)
+  .text-accent-2,
+  &.text-accent-2
+    text-red(1100)
+  .text-accent-3,
+  &.text-accent-3
+    text-red(1200)
+  .text-accent-4,
+  &.text-accent-4
+    text-red(1300)
+  .text-base,
+  &.text-base
+    text-red(500)
+.border-red
+  border-red()
+  .border-minus-1,
+  &.border-minus-1
+    border-red(400)
+  .border-minus-2,
+  &.border-minus-2
+    border-red(300)
+  .border-minus-3,
+  &.border-minus-3
+    border-red(200)
+  .border-minus-4,
+  &.border-minus-4
+    border-red(100)
+  .border-minus-5,
+  &.border-minus-5
+    border-red(50)
+  .border-plus-1,
+  &.border-plus-1
+    border-red(600)
+  .border-plus-2,
+  &.border-plus-2
+    border-red(700)
+  .border-plus-3,
+  &.border-plus-3
+    border-red(800)
+  .border-plus-4,
+  &.border-plus-4
+    border-red(900)
+  .border-accent-1,
+  &.border-accent-1
+    border-red(1000)
+  .border-accent-2,
+  &.border-accent-2
+    border-red(1100)
+  .border-accent-3,
+  &.border-accent-3
+    border-red(1200)
+  .border-accent-4,
+  &.border-accent-4
+    border-red(1300)
+  .border-base,
+  &.border-base
+    border-red(500)

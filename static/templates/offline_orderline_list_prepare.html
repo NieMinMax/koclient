@@ -1,0 +1,114 @@
+<div ng-controller="OrderlineListPrepareCtrl">
+  <div class="row">
+      <div class="form-inline pull-right">
+	    <input type="text" class="form-control" ng-model="search.place" placeholder="出品位" style="width:80px"/>
+	    <button class="btn btn-warning" ng-click="actionNewPlace()">调整出品位</button>
+
+	    <input type="text" class="form-control" ng-model="search.alarm" placeholder="超时提示" style="width:80px"/>
+	    <button class="btn btn-warning" ng-click="actionNewAlarm()">调整提示时间</button>
+
+	    <input type="text" class="form-control" ng-model="search.productCode" placeholder="商品编号" style="width:80px"/>
+	    <input type="text" class="form-control" ng-model="search.markNo" placeholder="餐牌编号" style="width:80px"/>
+	    <input type="text" class="form-control" ng-model="search.tableCode" placeholder="餐桌编号" style="width:80px"/>
+	    <button class="btn btn-warning" ng-click="actionClear()">清除</button>
+	    共 {{tempOrderlines.length}} 条
+	    <button class="btn btn-warning" ng-click="actionPrepareAll(tempOrderlines)">全部备好</button>
+      </div>
+    </div>
+    
+    <div class="row text-left">
+      <button ng-if="newLen>0" class="btn btn-warning btn-lg">
+	<span> {{newLen}}</span>
+	<span ng-click="actionRefresh()">新品，请点击查看 </span>
+      </button>
+    </div>
+
+    <div class="komain row">
+	<table st-table="tempOrderlines" st-safe-src="orderLines"  class="table">
+	    <thead>
+		<tr>
+		    <th/>
+		    <th>菜品</th>
+		    <th>做法</th>
+		    <th/>
+		    <th>数量</th>
+		    <th>餐桌</th>
+		    <th>牌号</th>
+		    <th>单号</th>
+		    <th>时间</th>
+		</tr>
+	    </thead>
+	    <tbody>
+	      <tr ng-repeat="line in tempOrderlines  | orderBy:'create_date'" ng-class="{'mark-important':line.t}">
+		  <td cs-select="line">  </td>
+		    <td>{{line.name}}</td>
+		    <td><span ng-repeat="one_treat in line.treat">{{one_treat}}  </span></td>
+		    <td>
+			<button ng-if="line.qty-line.prepare_qty>0" class="btn btn-info  btn-xs" ng-click="actionPrepare(line)">备菜</button>
+		    </td>
+		    <td>
+		      {{line.qty}}  /  {{pcount[line.id] || 0}}
+		      &nbsp;
+		      <button ng-if="pcount[line.id]>0" class="btn btn-info  btn-xs" ng-click="actionPrepareProduct(tempOrderlines, line.id)">查看</button>
+		    </td>
+		    <td>{{line.table_id | oneFilter:tables}}</td>
+		    <td>{{line.mark_no}}</td>
+		    <td>{{line.order}}</td>
+		    <td>{{line.create_date | date: 'HH:mm'}}</td>
+		</tr>
+	    </tbody>
+	</table>
+    </div>
+
+    <script type="text/ng-template" id="action_prepare_all.html">
+      <div class="modal-header">
+	<h3 class="modal-title">请求确认</h3>
+      </div>
+      <div class="modal-body text-center">
+	<h4>本页所显示的菜品已全部备好?</h4>
+      </div>
+      <div class="modal-footer">
+	<button class="btn btn-primary" ng-click="ok()">确认</button>
+	<button class="btn btn-warning" ng-click="cancel()">关闭</button>
+      </div>
+    </script>
+
+    
+    <script type="text/ng-template" id="action_prepare_product.html">
+      <div class="modal-body">
+	<table st-table="productLines" class="table">
+	  <thead>
+	    <tr>
+	      <th>菜品</th>
+	      <th>做法</th>
+	      <th>数量</th>
+	      <th>牌号</th>
+	      <th>餐台</th>
+	      <th>单号</th>
+	      <th>时间</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    <tr ng-repeat="line in productLines  | orderBy:'create_date'">
+	      <td>{{line.name}}</td>
+	      <td><span ng-repeat="one_treat in line.treat">{{one_treat}}  </span></td>
+	      <td>{{line.qty}}</td>
+	      <td>{{line.mark_no}}</td>
+	      <td>{{line.table_id | oneFilter:tables}}</td>
+	      <td>{{line.order}}</td>
+	      <td>{{line.create_date | date: 'HH:mm'}}</td>
+	    </tr>
+	  </tbody>
+	</table>
+      </div>
+      <div class="modal-footer">
+	<span>共: {{pcount}}份</span>
+	&nbsp;&nbsp;
+	<button class="btn btn-primary" ng-click="ok()">全部备好</button>
+	<button class="btn btn-warning" ng-click="cancel()">关闭</button>
+      </div>
+    </script>
+
+
+
+</div>

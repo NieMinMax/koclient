@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+<Product Id="F15A8FE5-7AA5-4BC8-8056-E843017574A2" Name="KoCRM" Language="2052" Version="1.2.0" Manufacturer="KoCRM" UpgradeCode="1DE12EE7-2E94-42AC-979F-06245A0ADE30" Codepage='936'>
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+    <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+		    <File Id="kocrm"  Source="Main.exe"/>
+		    <File Id="icudtdll"  Source="icudt.dll"/>
+		    <File Id="libcefdll"  Source="libcef.dll"/>
+
+		    <RegistryValue Root="HKCU"
+	  			   Key="Software\Microsoft\kocrm"
+	  			   Name="installed"
+	  			   Type="integer"
+	  			   Value="1"
+	  			   KeyPath="yes"/>
+
+		    <Shortcut Id="DesktopShortcut"
+	    		      Directory="DesktopFolder"
+	    		      Name="客多点客户端"
+	    		      Target="[INSTALLFOLDER]Main.exe"
+	    		      WorkingDirectory="INSTALLFOLDER"/>
+
+		    <Shortcut Id="ApplicationStartMenuShortcut"
+			      Name="客多点客户端"
+			      Description="客多点打印必备"
+
+    
+		    <File Id="kocrm"  Source="Main.exe"/>
+		    <File Id="icudtdll"  Source="icudt.dll"/>
+		    <File Id="libcefdll"  Source="libcef.dll"/>
+
+		    <RegistryValue Root="HKCU"
+	  			   Key="Software\Microsoft\kocrm"
+	  			   Name="installed"
+	  			   Type="integer"
+	  			   Value="1"
+	  			   KeyPath="yes"/>
+
+		    <Shortcut Id="DesktopShortcut"
+	    		      Directory="DesktopFolder"
+	    		      Name="客多点客户端"
+	    		      Target="[INSTALLFOLDER]Main.exe"
+	    		      WorkingDirectory="INSTALLFOLDER"/>
+
+		    <Shortcut Id="ApplicationStartMenuShortcut"
+			      Name="客多点客户端"
+			      Description="客多点打印必备"
+
+		    <File Id="kocrm"  Source="Main.exe"/>
+		    <File Id="icudtdll"  Source="icudt.dll"/>
+		    <File Id="libcefdll"  Source="libcef.dll"/>
+
+		    <RegistryValue Root="HKCU"
+	  			   Key="Software\Microsoft\kocrm"
+	  			   Name="installed"
+	  			   Type="integer"
+	  			   Value="1"
+	  			   KeyPath="yes"/>
+
+		    <Shortcut Id="DesktopShortcut"
+	    		      Directory="DesktopFolder"
+	    		      Name="客多点客户端"
+	    		      Target="[INSTALLFOLDER]Main.exe"
+	    		      WorkingDirectory="INSTALLFOLDER"/>
+
+		    <Shortcut Id="ApplicationStartMenuShortcut"
+			      Name="客多点客户端"
+			      Description="客多点打印必备"
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+        <Directory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="kocrm">
+		<Component Id="ProductComponent" Guid="B5F0C012-49D6-4C63-AFCA-0CE6C24C6D7D">
+		    <File Id="kocrm"  Source="Main.exe"/>
+		    <File Id="icudtdll"  Source="icudt.dll"/>
+		    <File Id="libcefdll"  Source="libcef.dll"/>
+
+		    <RegistryValue Root="HKCU"
+	  			   Key="Software\Microsoft\kocrm"
+	  			   Name="installed"
+	  			   Type="integer"
+	  			   Value="1"
+	  			   KeyPath="yes"/>
+
+		    <Shortcut Id="DesktopShortcut"
+	    		      Directory="DesktopFolder"
+	    		      Name="客多点客户端"
+	    		      Target="[INSTALLFOLDER]Main.exe"
+	    		      WorkingDirectory="INSTALLFOLDER"/>
+
+		    <Shortcut Id="ApplicationStartMenuShortcut"
+			      Name="客多点客户端"
+			      Description="客多点打印必备"
+			      Target="[#kocrm]"
+			      WorkingDirectory="INSTALLFOLDER"/>
+
+		    <!-- <Shortcut Id="UninstallProduct"              -->
+		    <!-- 	      Name="卸载客多点" -->
+		    <!-- 	      Target="[System64Folder]msiexec.exe" -->
+		    <!-- 	      Arguments="/x [ProductCode]" -->
+		    <!-- 	      Description="卸载客多点" /> -->
+
+		</Component>
+		
+		<Directory Id="Locales" Name="locales">
+		    <Component Id="LocaleComponent" Guid="B294D91D-D469-4650-A029-D9B96EAB309B">
+			<File Id="enus" Source="locales/en-US.pak" />
+			<File Id="zhcn" Source="locales/zh-CN.pak" />
+		    </Component>
+		</Directory>
+		
+		<Directory Id="DesktopFolder" Name="Desktop" />
+
+		<!-- Static -->
+		<Directory Id="STATICFOLDER" Name="static">
+		    <!-- Templates -->
+		    <Directory Id="TEMPLATESFOLDER" Name="templates">
+			<Component Id="TemplatesComponent" Guid="1D7CCF4E-3AD0-4BE5-8A2E-1C027EE649BA">
+			    <File Id="base" Source="static/templates/base.html" />
+			    <File Id="data" Source="static/templates/data.html" />
+			    <File Id="exchange" Source="static/templates/exchange.html" />
+			    <File Id="main" Source="static/templates/main.html" />
+			    <File Id="offline_dashboard" Source="static/templates/offline_dashboard.html" />
+			    <File Id="offline_main" Source="static/templates/offline_main.html" />
+			    <File Id="offline_order_today" Source="static/templates/offline_order_today.html" />
+			    <File Id="orderline_list_done" Source="static/templates/offline_orderline_list_done.html" />
+			    <File Id="orderline_list_prepare" Source="static/templates/offline_orderline_list_prepare.html" />
+			    <File Id="offline_pos_chinese" Source="static/templates/offline_pos_chinese.html" />        
+			    <File Id="offline_pos_order" Source="static/templates/offline_pos_order.html" />
+			    <File Id="offline_pos_session" Source="static/templates/offline_pos_session.html" />
+			    <File Id="offline_product_list" Source="static/templates/offline_product_list.html" />
+			    <File Id="printer" Source="static/templates/printer.html" />
+			</Component>
+		    </Directory>
+		    <!-- CSS -->
+		    <Directory Id="CSSFOLDER" Name="css">
+			<Component Id="CSSComponent" Guid="4DC3D15D-692E-461E-8BD9-0BA799F44E95">
+			    <File Id="keyboard" Source="static/css/keyboard.css" />
+			    <File Id="kolocalcss" Source="static/css/kolocal.css" />
+			    <File Id="bootstrapcss" Source="static/bower_components/bootstrap/dist/css/bootstrap.css" />
+			</Component>
+		    </Directory>
+		    <!-- JS -->
+		    <Directory Id="JSFOLDER" Name="js">
+			<Component Id="JSComponent" Guid="B2C6B8CE-CA5E-410C-88DA-57738CF07912">
+			    <File Id="kolocaljs" Source="static/js/kolocal.min.js" />
+			    <File Id="exchangejs" Source="static/js/exchange.min.js" />
+			    <File Id="angularjs" Source="static/bower_components/angular/angular.min.js" />
+			    <File Id="bootstrapjs" Source="static/bower_components/angular-bootstrap/ui-bootstrap.min.js" />
+			    <File Id="tplsjs" Source="static/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js" />
+			    <File Id="routejs" Source="static/bower_components/angular-route/angular-route.min.js" />
+			    <File Id="sanitizejs" Source="static/bower_components/angular-sanitize/angular-sanitize.min.js" />
+			    <File Id="localstoragejs" Source="static/bower_components/angular-local-storage/angular-local-storage.min.js" />
+			</Component>
+		    </Directory>
+
+		    <!-- Images -->
+		    <Directory Id="IMAGESFOLDER" Name="images">
+			<Component Id="ImagesComponent" Guid="5C951EA2-5731-48BA-8504-6CB9097CAED6">
+			    <File Id="backspaceimg" Source="static/images/backspace.png" />
+			</Component>
+		    </Directory>
+		</Directory>
+            </Directory>
+        </Directory>
+    </Directory>
+
+    <Feature Id="ProductFeature" Title="客多点客户端" Level="1">
+        <ComponentRef Id="ProductComponent" />
+	<ComponentRef Id="LocaleComponent"/>
+        <ComponentRef Id="TemplatesComponent"/>
+        <ComponentRef Id="CSSComponent"/>
+        <ComponentRef Id="JSComponent"/>
+        <ComponentRef Id="ImagesComponent"/>
+    </Feature>
+
+    <Upgrade Id="EE0A4FA4-6189-4C41-BED7-3F4EA2C8EBF1">
+	<UpgradeVersion OnlyDetect="no" Property="PREVIOUSFOUND"
+      			Minimum="1.0.0" IncludeMinimum="yes"
+      			Maximum="1.2.0" IncludeMaximum="yes" />
+    </Upgrade>
+
+    <InstallExecuteSequence>
+	<RemoveExistingProducts Before="InstallInitialize" />
+    </InstallExecuteSequence>
+    
+</Product>
+
+</Wix>

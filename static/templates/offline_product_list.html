@@ -1,0 +1,87 @@
+<div ng-controller="KProductListCtrl">
+
+  <div class="row">
+    <div class="form-inline pull-right">
+	<input type="text" class="form-control" id="name" ng-model="search.productCode" placeholder="商品编号" style="width:80px"/>
+	<button class="btn btn-warning" ng-click="actionClearProduct()">清除</button>
+    </div>
+  </div>
+
+  <div class="komain row">
+    <table st-table="tempProducts"  st-safe-src="products"  class="table">
+      <thead>
+	<tr>
+	  <th st-sort="name">名称</th>
+	  <th/>
+	  <th st-sort="temp_state">售完</th>
+	  <th/>
+	  <th st-sort="is_new">新品</th>
+	  <!-- <th st-sort="is_promotion">促销</th> -->
+	</tr>
+      </thead>
+      <tbody>
+	<tr ng-repeat="product in tempProducts">
+	  <td>{{product.name}}</td>
+	  <td>
+            <button ng-if="product.temp_state!='t'" class="btn btn-warning btn-xs" ng-click="actionPauseSell(product.id)">停售</button>
+	  </td>
+	  <td>{{product.temp_state | product_tstate}}</td>
+	  <td>
+            <button ng-if="product.temp_state!='f'" class="btn btn-warning btn-xs" ng-click="actionReSell(product.id)">开售</button>
+	  </td>
+	  <td>{{product.is_new | product_nstate}}</td>
+	  <!-- <td>{{product.is_promotion | product_pstate}}</td> -->
+	</tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- <div class="kochange row"> -->
+  <!--   <div class="form-inline pull-right"> -->
+  <!--     <button class="btn btn-info" ng-click="actionLast()">上一页</button> -->
+  <!--     <button class="btn btn-info" ng-click="actionNext()">下一页</button> -->
+  <!--   </div> -->
+  <!-- </div> -->
+
+  <script type="text/ng-template" id="action_delete.html">
+    <div class="modal-header">
+      <h3 class="modal-title">确认</h3>
+    </div>
+    <div class="modal-body">
+      确认需要删除{{length}}条纪录?
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" ng-click="ok()">确认</button>
+      <button class="btn btn-warning" ng-click="cancel()">取消</button>
+    </div>
+  </script>
+
+
+    <script type="text/ng-template" id="action_pause_sell.html">
+	<div class="modal-header">
+	    <h3 class="modal-title">确认该菜品全部售完?</h3>
+	</div>
+	<div class="modal-body">
+	  确认后该操作后，该商品将暂时禁止下单。
+	</div>
+	<div class="modal-footer">
+	    <button class="btn btn-primary" ng-click="ok()">确认</button>
+	    <button class="btn btn-warning" ng-click="cancel()">关闭</button>
+	</div>
+    </script>
+
+    <script type="text/ng-template" id="action_re_sell.html">
+	<div class="modal-header">
+	    <h3 class="modal-title">确认该菜品可售?</h3>
+	</div>
+	<div class="modal-body">
+	    确认后该操作后，该商品将立即可下单。
+	</div>
+	<div class="modal-footer">
+	    <button class="btn btn-primary" ng-click="ok()">确认</button>
+	    <button class="btn btn-warning" ng-click="cancel()">关闭</button>
+	</div>
+    </script>
+
+
+</div>

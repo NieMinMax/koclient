@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html ng-app="offline" ng-strict-di ng-controller="BaseCtrl">
+
+<head>
+    <title ng-bind="bc"> 客多点餐厅管理系统 </title>
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/animate.css/animate.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/bower_components/c3/c3.css"/>
+    <!-- <link rel="stylesheet"  type="text/css" href="/static/css/kochinese.css"/> -->
+    <link rel="stylesheet"  type="text/css" href="/static/css/keyboard.css"/>
+
+    <script type="text/javascript" src="/static/bower_components/angular/angular.js"></script>
+    <script type="text/javascript" src="/static/bower_components/angular-locale_zh-cn/angular-locale_zh-cn.js"></script>
+    <script type="text/javascript" src="/static/bower_components/angular-route/angular-route.js"></script>
+    <script type="text/javascript" src="/static/bower_components/angular-bootstrap/ui-bootstrap.js"></script>
+    <script type="text/javascript" src="/static/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script type="text/javascript" src="/static/bower_components/angular-smart-table/dist/smart-table.debug.js"></script>
+    <script type="text/javascript" src="/static/bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script type="text/javascript" src="/static/js/offline.min.js"></script> 
+</head>
+
+<body reheight>
+    <div class="ko-nomenu">
+	<button type="button" ng-if="!showMenu" class="btn btn-xs btn-default" ng-click="openMenu()">
+	    <span class="glyphicon glyphicon-th"></span>
+	</button>
+    </div>
+
+    <div unsolved class="container-fluid">
+	<div class="row koheader" ng-if="showMenu">
+	    <div class="komenu col-xs-12 col-lg-12">
+
+		<span class="dropdown" ng-if="access.Service">
+		    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+			服务
+			<span class="caret"></span>
+		    </button>
+		    <ul class="dropdown-menu" role="menu">
+			<li role="presentation"><a  role="menuitem" tabindex="-1" href="#/service/chinese/pos">中餐点餐</a></li>
+			<li role="presentation"><a role="menuitem" tabindex="-1" href="#/kproducts/1/list">商品估清</a></li>
+			<li role="presentation"><a role="menuitem" tabindex="-1" href="#/orders/today">今日订单</a></li>
+			<li role="presentation"><a role="menuitem" tabindex="-1" href="#/kitchen/list/prepare">厨房备菜</a></li>
+			<li role="presentation"><a role="menuitem" tabindex="-1" href="#/kitchen/list/done">出品传菜</a></li>
+		    </ul>
+		</span>
+		<button type="button" class="btn btn-xs btn-primary" ng-click="closeMenu()">
+		    <span class="glyphicon glyphicon-resize-small"></span>
+		</button>
+
+	    </div>
+	</div>
+
+	
+	<div ng-if="showBc" class="kobreadcrumbs">
+	    <button class='btn btn-default' ng-click="actionBack()">
+		&nbsp >>> &nbsp
+	    </button>
+	    {{bc}}
+	</div>
+
+	<!-- 扁平化分块! -->
+	<div ng-view></div>
+	
+    </div>
+    
+    <div class="koalert">
+	<alert type="danger" ng-if="err" class="row">
+	    {{err}}
+	    <button type="button" class="btn btn-xs btn-info" ng-click="closeError()">关闭 <span>&times;</span></button>
+	</alert>
+    </div>
+
+    <div class="kofooter">
+	<span style="font-family:arial;">Copyright &copy; </span>客多点
+    </div>
+
+    <script type="text/ng-template" id="action_exit.html">
+	<div class="modal-header">
+	    <h3 class="modal-title">确认</h3>
+	</div>
+	<div class="modal-body">
+	    <div>确认退出?</div>
+	</div>
+	<div class="modal-footer">
+	    <button class="btn btn-primary" ng-click="ok()">确认</button>
+	    <button class="btn btn-warning" ng-click="cancel()">取消</button>
+	</div>
+    </script>
+
+</body>
+</html>
+
+

@@ -1,0 +1,93 @@
+<div ng-controller="OrderTodayCtrl">
+  <div class="form-inline pull-left">
+    <button class="btn btn-info" ng-click="actionAll()">全部</button>
+    <button class="btn btn-info" ng-click="actionAllIn()">堂食/外带</button>
+    <button class="btn btn-info" ng-click="actionAllOut()">外卖</button>
+  </div>
+  <div class="pull-right">
+    <span style="font-size:1.6rem;margin:0 1rem">共{{tempOrders.length}}单</span>
+  </div>
+  
+    <div class="komain row">
+	<table st-table="tempOrders"  st-safe-src="orders" class="table">
+	    <thead>
+		<tr>
+		    <th>单号</th>
+		    <th>类型</th>
+		    <th>金额</th>
+		    <th>收款状态</th>
+		    <th>实收金额</th>
+		    <th>餐台</th>
+		    <th>牌号</th>
+		    <th>状态</th>
+		    <th>创建时间</th>
+		    <th/>
+		</tr>
+	    </thead>
+	    <tbody>
+		<tr st-select-row="orders" ng-repeat="order in tempOrders |orderBy:'-create_date'">
+		    <td>{{order.name}}</td>
+		    <td>{{order.order_type | order_type}}</td>
+		    <td>{{order.totalprice | currency:'￥'}}</td>
+		    <td>{{order.has_pay | true_false}}</td>
+		    <td>{{order.money_pay | currency:'￥'}}</td>
+		    <td>{{order.table_id | oneFilter:tables}}</td>
+		    <td>{{order.mark_no}}</td>
+		    <td>{{order.state | order_state}}</td>
+		    <td>{{order.create_date | date:'HH:mm:ss'}}</td>
+		    <td>
+		      <button class="btn btn-info  btn-xs" ng-click="actionDetail(order)">详情</button>
+		    </td>
+		</tr>
+	    </tbody>
+	</table>
+    </div>
+
+
+    <script type="text/ng-template" id="action_detail.html">
+	<div class="modal-header">
+	    <h3 class="modal-title">确认</h3>
+	</div>
+	<div class="modal-body">
+	  <div>状态: {{order.state | order_state}} &nbsp; &nbsp;{{order.totalprice | currency:'￥'}}元</div>
+	  <div>{{order.name}} &nbsp;&nbsp;&nbsp;&nbsp;{{order.create_date | date:'HH:mm:ss'}} &nbsp;&nbsp;&nbsp;&nbsp; {{order.type | order_type}}</div>
+	  <div>备注: {{order.note}}</div> 
+	  <div ng-if="order.type=='out'">
+	    <div>地址: {{order.member.address}}</div> 
+	    <div>联系人: {{order.member.name}} </div>
+	    <div>电话: {{order.member.tel}} </div>
+	  </div>
+	  <table st-table="order.lines" class="table">
+	    <thead>
+	      <tr>
+		<th>名称</th>
+		<th>做法</th>
+		<th>数量</th>
+		<th>价格</th>
+		<th>折扣</th>
+		<th>取消</th>
+		<th>退品</th>
+		<th>上菜</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr ng-repeat="line in order.lines">
+		<td>{{line.name}}</td>
+		<td>{{line.treat.toString()}}</td>
+		<td>{{line.qty}}</td>
+		<td>{{line.price | currency:'￥'}}</td>
+		<td>{{line.discount}}</td>
+		<td>{{line.cancel_qty}}</td>
+		<td>{{line.return_qty}}</td>
+		<td>{{line.done_qty}}</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	</div>
+	<div class="modal-footer">
+	  <button class="btn btn-warning" ng-click="cancel()">关闭</button>
+	</div>
+    </script>
+
+
+</div>

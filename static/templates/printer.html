@@ -1,0 +1,250 @@
+<div ng-controller="PrinterCtrl">
+    <h3 class="text-center">
+	POS打印机设置
+	&nbsp;&nbsp;
+	<button class="btn btn-primary" ng-click="actionSave()">
+	    <span class="glyphicon glyphicon-floppy-save"></span>
+	    保存
+	</button>
+	<button type="button" class="btn btn-primary" ng-click="actionClose()" >
+	    <span class="glyphicon glyphicon-remove"></span>
+	    退出
+	</button>
+    </h3>
+
+    <div class="printer">
+	<form role="form">
+	    <div class="row part"  style="background-color:#eeeeee;padding:3rem">
+		<h4 class="text-left">1. 网络订单设置</h4>
+		<span>&nbsp; (1) 打印网络订单</span>
+		<input type="checkbox" ng-model="download" id="download"/>
+		<div class="text-left">&nbsp; (勾选后将自动打印网络订单,勿在多台机器上同时设置该选项)</div>
+		<div ng-if="download">
+		    <div class="form-group col-md-6 col-xs-12" >
+			<label for="company_id">公司ID</label>
+			<input type="text" class="form-control" ng-model="$parent.company_id" id="company_id" placeholder="使用管理员账号登陆系统,在系统管理-->餐厅信息中可见"/>
+		    </div>
+		    <div class="form-group col-md-6 col-xs-12" >
+			<label for="server_key">下载密钥</label>
+			<input type="password" class="form-control" ng-model="$parent.server_key" id="server_key" placeholder="使用管理员账号登陆系统,在系统管理-->餐厅信息中可见"/>
+		    </div>
+		</div>
+	    </div>
+
+	    <div class="row part"  style="background-color:#ffffff;padding:3rem">
+		<h4 class="text-left">2. 小票/交班/钱箱打印机</h4>
+		<div >
+		    <div>
+			<div class="form-group col-md-6 col-xs-12" >
+			    <label for="type">打印机类别</label>
+			    <select ng-model="receiptPrinter.type" ng-options="printer_type.value as printer_type.name for printer_type in avail_printer_types"  class="form-control" id="type">
+			    </select>
+			</div>
+
+			<div class="form-group  col-md-6 col-xs-12">
+			    <label for="width">宽度(mm)</label>
+			    <input class="form-control" type="number" ng-model="receiptPrinter.width" id="width" placeholder="打印纸宽度(mm)" name="width" tooltip="常见打印机宽度为58mm与80mm" tooltip-placement="top" tooltip-trigger="mouseenter"/>
+			</div>
+			
+			<div class="form-group  col-md-6 col-xs-12" ng-if="receiptPrinter.type=='driver'">
+			    <label for="width">名称</label>
+			    <select ng-model="receiptPrinter.printer_name" ng-options="(' ' + name) for name in localprinters"  class="form-control"></select>
+			</div>
+
+			<div ng-if="receiptPrinter.type=='net'">
+			    <div class="form-group col-md-6  col-xs-12" ng-if="receiptPrinter.type=='net'">
+				<label for="width" class="control-label">I P</label>
+				<input class="form-control" type="text" ng-model="receiptPrinter.ip" id="width" placeholder="打印机IP" name="width"/>
+			    </div>
+			    <div class="form-group col-md-6  col-xs-12">
+				<label for="width" class="control-label">端口</label>
+				<input class="form-control" type="text" ng-model="receiptPrinter.port" id="width" name="width"/>
+				<div>网络打印机端口一般为9100</div>
+			    </div>
+			</div>
+		    </div>
+		</div>
+	    </div>
+
+	    <div class="row part"  style="background-color:#eeeeee;padding:3rem">
+		<h4 class="text-left">
+		  3. 餐桌总单打印机
+		    <button class="btn btn-primary btn-xs" ng-click="addTablePrinter()">
+			<span class="glyphicon glyphicon-print"></span>
+			添加
+		    </button>
+		</h4>
+		<div ng-repeat="onePrinter in tablePrinters">
+		    <div style="clear:both">
+			&nbsp;({{$index+1}}).&nbsp;
+			<button class="btn btn-warning btn-xs" ng-click="removeTablePrinter($index)">
+			    <span class="glyphicon glyphicon-print"></span>
+			    删除
+			</button>
+		    </div>
+		    <div class="form-group col-md-4 col-xs-12">
+			<label for="place" class="control-label">
+			    餐桌开始编号
+			</label>
+			<input class="form-control" type="number" ng-model="onePrinter.start_code" id="start_code" name="start_code">
+			</input>
+		    </div>
+		    <div class="form-group col-md-4 col-xs-12">
+			<label for="place" class="control-label">
+			    餐桌结束编号
+			</label>
+			<input class="form-control" type="number" ng-model="onePrinter.end_code" id="end_code" name="end_code">
+			</input>
+		    </div>
+		    <div class="form-group col-md-4 col-xs-12">
+			<label for="type" class="control-label">打印机类别</label>
+			<select ng-model="onePrinter.type" ng-options="printer_type.value as printer_type.name for printer_type in avail_printer_types"  class="form-control">
+			</select>
+		    </div>
+		    <div class="form-group col-md-4 col-xs-12">
+			<label for="width" class="control-label">宽度</label>
+			<input class="form-control" type="number" ng-model="onePrinter.width" placeholder="打印纸宽度(mm)" name="width"/>
+		    </div>
+		    <div class="form-group  col-md-4 col-xs-12" ng-if="onePrinter.type=='driver'">
+			<label for="width">名称</label>
+			<select ng-model="onePrinter.printer_name" ng-options="(' ' + name) for name in localprinters"  class="form-control"></select>
+		    </div>
+		    <div ng-if="onePrinter.type=='net'">
+			<div class="form-group col-md-4 col-xs-12">
+			    <label for="ip" class="control-label">IP</label>
+			    <input class="form-control" type="text" ng-model="onePrinter.ip" placeholder="打印机IP" name="ip" ng-disabled="onePrinter.type!='net'"/>
+			</div>
+			<div class="form-group col-md-4 col-xs-12">
+			    <label for="port" class="control-label">端口</label>
+			    <input class="form-control" type="text" ng-model="onePrinter.port" placeholder="例如:9100" name="port"/>
+			</div>
+		    </div>
+		    <div class="form-group col-md-12 col-xs-12">
+			<label for="name" class="control-label">备注</label>
+			<input class="form-control" type="text" ng-model="onePrinter.name" placeholder="描述" name="width"/>
+		    </div>
+		</div>
+	    </div>
+
+	    <div class="row part"  style="background-color:#ffffff;padding:3rem">
+		<h4 class="text-left">
+		  4. 出品打印机
+		    <button class="btn btn-primary btn-xs" ng-click="addCookiePrinter()">
+			<span class="glyphicon glyphicon-print"></span>
+			添加
+		    </button>
+		</h4>
+		<div class="form-group  col-md-4 col-xs-12">
+		  <label for="width">退品/退单打印至出品</label>
+		  <input type="checkbox" ng-model="returned_notify"/>
+		</div>		    
+		<div ng-repeat="onePrinter in cookiePrinters">
+		    <div style="clear:both">
+			&nbsp;{{$index+1}}.&nbsp;
+			<button class="btn btn-warning btn-xs" ng-click="removeCookiePrinter($index)">
+			    <span class="glyphicon glyphicon-print"></span>
+			    删除
+			</button>
+		    </div>
+		    <div class="form-group col-md-4 col-xs-12">
+			<label for="place" class="control-label">
+			    出品位
+			</label>
+			<select ng-model="onePrinter.place" ng-options="one_place for one_place in avail_place"  class="form-control">
+			</select>
+			&nbsp;&nbsp; (参考: 1.厨房 2.水吧 3.明档 4.红案 5.白案 6.7.8.9.其它)
+		    </div>
+		    <div class="form-group col-md-4 col-xs-12">
+			<label for="type" class="control-label">打印机类别</label>
+			<select ng-model="onePrinter.type" ng-options="printer_type.value as printer_type.name for printer_type in avail_printer_types"  class="form-control">
+			</select>
+		    </div>
+		    <div class="form-group col-md-4 col-xs-12">
+			<label for="width" class="control-label">宽度</label>
+			<input class="form-control" type="number" ng-model="onePrinter.width" placeholder="打印纸宽度(mm)" name="width"/>
+		    </div>
+		    <div class="form-group  col-md-4 col-xs-12" ng-if="onePrinter.type=='driver'">
+			<label for="width">名称</label>
+			<select ng-model="onePrinter.printer_name" ng-options="(' ' + name) for name in localprinters"  class="form-control"></select>
+		    </div>
+
+		    <div class="form-group  col-md-4 col-xs-12" ng-if="onePrinter.type=='driver'">
+			<label for="width">每品一单</label>
+			<input type="checkbox" ng-model="onePrinter.is_split"/>
+		    </div>		    
+		    
+		    <div ng-if="onePrinter.type=='net'">
+			<div class="form-group col-md-4 col-xs-12">
+			    <label for="ip" class="control-label">IP</label>
+			    <input class="form-control" type="text" ng-model="onePrinter.ip" placeholder="打印机IP" name="ip" ng-disabled="onePrinter.type!='net'"/>
+			</div>
+			<div class="form-group col-md-4 col-xs-12">
+			    <label for="port" class="control-label">端口</label>
+			    <input class="form-control" type="text" ng-model="onePrinter.port" placeholder="例如:9100" name="port"/>
+			</div>
+		    </div>
+		    <div class="form-group col-md-12 col-xs-12">
+			<label for="name" class="control-label">备注</label>
+			<input class="form-control" type="text" ng-model="onePrinter.name" placeholder="描述" name="width"/>
+		    </div>
+		</div>
+
+	    </div>
+	    <div class="row part"  style="background-color:#eeeeee;padding:3rem">
+		<h4 class="text-left">
+		    5. 传菜打印机
+		    <button class="btn btn-primary btn-xs" ng-click="addDonePrinter()">
+			<span class="glyphicon glyphicon-print"></span>
+			添加
+		    </button>
+		</h4>
+		<div ng-repeat="onePrinter in donePrinters">
+		    <div style="clear:both">
+			&nbsp;{{$index+1}}.&nbsp;
+			<button class="btn btn-warning btn-xs" ng-click="removeDonePrinter($index)">
+			    <span class="glyphicon glyphicon-print"></span>
+			    删除
+			</button>
+		    </div>
+		    <div class="form-group col-md-4 col-xs-12">
+			<label for="place" class="control-label">
+			    出品位
+			</label>
+			<select ng-model="onePrinter.place" ng-options="one_place for one_place in avail_place"  class="form-control">
+			</select>
+			&nbsp;&nbsp; (参考: 1.厨房 2.水吧 3.明档 4.红案 5.白案 6.7.8.9.其它)
+		    </div>
+		    <div class="form-group col-md-4 col-xs-12">
+			<label for="type" class="control-label">打印机类别</label>
+			<select ng-model="onePrinter.type" ng-options="printer_type.value as printer_type.name for printer_type in avail_printer_types"  class="form-control">
+			</select>
+		    </div>
+		    <div class="form-group col-md-4 col-xs-12">
+			<label for="width" class="control-label">宽度</label>
+			<input class="form-control" type="number" ng-model="onePrinter.width" placeholder="打印纸宽度(mm)" name="width"/>
+		    </div>
+		    <div class="form-group  col-md-4 col-xs-12" ng-if="onePrinter.type=='driver'">
+			<label for="width">名称</label>
+			<select ng-model="onePrinter.printer_name" ng-options="(' ' + name) for name in localprinters"  class="form-control"></select>
+		    </div>
+
+		    <div ng-if="onePrinter.type=='net'">
+			<div class="form-group col-md-4 col-xs-12">
+			    <label for="ip" class="control-label">IP</label>
+			    <input class="form-control" type="text" ng-model="onePrinter.ip" placeholder="打印机IP" name="ip" ng-disabled="onePrinter.type!='net'"/>
+			</div>
+			<div class="form-group col-md-4 col-xs-12">
+			    <label for="port" class="control-label">端口</label>
+			    <input class="form-control" type="text" ng-model="onePrinter.port" placeholder="例如:9100" name="port"/>
+			</div>
+		    </div>
+		    <div class="form-group col-md-12 col-xs-12">
+			<label for="name" class="control-label">备注</label>
+			<input class="form-control" type="text" ng-model="onePrinter.name" placeholder="描述" name="width"/>
+		    </div>
+		</div>
+
+	    </div>
+	</form>
+    </div>
+</div>

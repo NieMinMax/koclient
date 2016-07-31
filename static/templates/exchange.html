@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html data-ng-app="kolocal" ng-csp ng-strict-di>
+    <head>
+	<meta charset="utf-8"/>
+
+	<title>客多点</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<script type="text/javascript" src="/static/js/angular.min.js"></script>
+	<script type="text/javascript" src="/static/js/angular-local-storage.min.js"></script>
+	<script type="text/javascript" src="static/js/exchange.min.js"></script> 
+    </head>
+
+    <body ng-controller="ExchangeCtrl">
+      <div class="embed-responsive">
+	<iframe id="client" iframe-onload="iframeLoadedCallBack()" src="http://www.kocrm.com" width="100%" height="{{bodyHeight}}px" frameborder="no" seamless=true></iframe>
+      </div>
+    </body>
+</html>
+
+

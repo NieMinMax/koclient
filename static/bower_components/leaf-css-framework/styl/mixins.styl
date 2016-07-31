@@ -1,0 +1,97 @@
+clearfix()
+  &:before,
+  &:after
+    content: " "
+    display: table
+  &:after
+    clear: both
+
+base-padding($px = 10px)
+  padding: $px
+
+inline()
+  display: inline-block
+  *display: inline // IE7 inline-block hack
+  *zoom: 1
+
+perspective()
+  -webkit-perspective: argument
+  -moz-perspective: argument
+  -ms-perspective: argument
+  perspective: argument
+
+border-radius($px)
+  -webkit-border-radius:$px
+  -moz-border-radius:$px
+  border-radius:$px
+
+backface-visibility()
+  -webkit-backface-visibility: arguments
+  -moz-backface-visibility: arguments
+  -ms-backface-visibility: arguments
+  backface-visibility: arguments
+
+transform-style()
+  -webkit-transform-style: arguments
+  -moz-transform-style: arguments
+  -o-transform-style: arguments
+  -ms-transform-style: arguments
+  transform-styke: arguments
+
+transform()
+  -webkit-transform: arguments
+  -moz-transform: arguments
+  -o-transform: arguments
+  -ms-transform: arguments
+  transform: arguments
+
+transition()
+  -webkit-transition: arguments
+  -moz-transition: arguments
+  -o-transition: arguments
+  -ms-transition: arguments
+  transition: arguments
+
+box-shadow()
+  -webkit-box-shadow: arguments
+  -moz-box-shadow: arguments
+  box-shadow: arguments
+
+text-center()
+  text-align: center
+
+text-left()
+  text-align: left
+
+text-right()
+  text-align: right
+
+unstyled()
+  list-style:none
+  margin:0
+  padding:0
+  
+small()
+  font-size: 80%
+  
+large()
+  font-size: 120%
+
+center(textcenter = false)
+  crow()
+  if !textcenter
+    text-align: left
+
+depth(strength = 0)
+  if strength == 5
+    box-shadow: 0px 12px 20px 2px rgba(0,0,0,.30)
+  else if strength == 4
+    box-shadow: 0px 9px 17px 2px rgba(0,0,0,.25)
+  else if strength == 3
+    box-shadow: 0px 6px 12px 2px rgba(0,0,0,.19)
+  else if strength == 2
+    box-shadow: 0px 3px 8px 0px rgba(0,0,0,.16)
+  else if strength == 1
+    box-shadow: 0px 1px 2px 1px rgba(0,0,0,.12)
+  else
+    box-shadow: none

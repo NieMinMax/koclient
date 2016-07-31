@@ -1,0 +1,886 @@
+<div ng-controller="ServicePosCtrl" class="pos" ng-keypress="hello($event)">
+
+    <div class="pull-left op">
+
+	<div class="op-pool">
+	    <button  class="btn btn-warning" ng-click="actionHistory()">
+		退出
+	    </button>
+
+	    <button class="btn btn-warning" ng-hide="show.sold" ng-click="actionPersonQty()">人数</button>
+	    <button class="btn btn-warning" ng-disabled="cartProducts.length==0"
+		    ng-click="actionPushOrder()">挂单</button>
+	    <button class="btn btn-warning" ng-disabled="poolOrder.length==0" ng-click="actionPullOrder()">取单</button>
+	    <button class="btn btn-warning" ng-if="show.cashbox" ng-click="actionCashbox()">钱箱</button>
+	    <button class="btn btn-warning" ng-hide="show.sold" ng-click="actionShowSold()">订单</button>
+	</div>
+
+	<div class="op-cart">
+	    <!-- 购物车 -->
+	    <div ng-if="(cartProducts | json) != '[]'"  class="tmoney">
+		订单总金额: <span> {{cartMoney | currency:'￥'}}</span>
+	    </div>
+	    <div class="tmark">
+		<div ng-if="currentData.markNo" class="text-left"><strong>牌号: {{currentData.markNo}} </strong></div>
+		<div ng-if="currentData.tableNo" class="text-right"><strong>餐桌: {{currentData.tableNo.name}}</strong></div>
+		<div ng-if="currentData.personQty" class="text-right"><strong>人数: {{currentData.personQty}}</strong></div>
+	    </div>
+	    <table ng-if="(cartProducts | json) != '[]'" st-table="cartProducts" class="table table-condensed product">
+		<thead>
+		    <tr>
+			<th/>
+			<th>品名</th>
+			<th>单价</th>
+			<th>折扣</th>
+			<th>数量</th>
+			<th>做法</th>
+		    </tr>
+		</thead>
+		<tbody>
+		    <tr st-select-row="product" ng-repeat="product in cartProducts | orderBy:'-'">
+			<td>
+			    <button  class="btn btn-warning btn-xs" ng-click="actionDelProduct($index)">
+				<span class="glyphicon glyphicon-trash"></span>
+			    </button>
+			</td>
+			<td>{{product.name}}</td>
+			<td>{{product.price | currency:'￥'}}</td>
+			<td>{{product.discount}}</td>
+			<td>{{product.qty}}</td>
+			<td ng-if="(product.treat | json) == '[]'"></td>
+			<td ng-if="(product.treat | json) != '[]'">{{product.treat}}</td>
+		    </tr>
+		</tbody>
+	    </table>
+
+	    <div ng-if="(cartProducts | json) == '[]'"  class="tmoney" style="text-align:center">
+		<h4>上一单</h4>
+		<div>总金额: {{lastOneOrder.cartMoney | currency:'￥'}}</div>
+		<div ng-repeat = "pay in lastOneOrder.pays" style="margin-top:0.4rem">
+		    <div>{{pay.pay_type|pay_type}}: {{pay.qty | currency:"￥"}}</div>
+		    <div ng-if="pay.pay_type=='cash'">
+			<div style="color:red">(交来:{{ lastOneOrder.rest + pay.qty | currency:"￥"}} &nbsp;&nbsp; 找零:{{lastOneOrder.rest | currency:"￥"}})</div>
+		    </div>
+		</div>
+
+	    </div>
+	    <table ng-if="(cartProducts | json) == '[]'" st-table="lastOneOrder.lines" class="table table-condensed product">
+		<thead>
+		    <tr>
+			<th></th>
+			<th>品名</th>
+			<th>单价</th>
+			<th>折扣</th>
+			<th>数量</th>
+			<th>做法</th>
+		    </tr>
+		</thead>
+		<tbody>
+		    <tr st-select-row="product" ng-repeat="product in lastOneOrder.lines | orderBy:'-'">
+			<td/>
+			<td>{{product.name}}</td>
+			<td>{{product.price | currency:'￥'}}</td>
+			<td>{{product.discount}}</td>
+			<td>{{product.qty}}</td>
+			<td ng-if="(product.treat | json) == '[]'"></td>
+			<td ng-if="(product.treat | json) != '[]'">{{product.treat}}</td>
+		    </tr>
+		</tbody>
+	    </table>
+
+	</div>
+
+	<div class="op-type">
+	    <button class="btn btn-warning" ng-if="allpay.use_mark"  ng-disabled="cartProducts.length==0" ng-click="actionMarkNo()">牌号</button>
+	    <button class="btn btn-warning" ng-disabled="cartProducts.length==0" ng-click="actionTableNo()">餐桌</button>
+	    <button class="btn btn-warning"  ng-disabled="cartProducts.length==0" ng-click="actionOut()">外带</button>
+	    <button class="btn btn-warning" ng-click="actionAddress()">外卖</button>
+	    <button class="btn btn-warning"  ng-disabled="cartProducts.length==0" ng-click="actionOthers()">其它</button>
+	</div>
+	
+	<div class="op-pay">
+	    <button class="btn btn-warning" ng-if="allpay.allow_cash" ng-disabled="cartProducts.length==0" ng-click="actionDiscount()" popover="给前面输入的商品添加折扣" popover-trigger="mouseenter" popover-placement="top" popover-append-to-body=true popover-popup-delay=500>折扣</button>
+	    <button class="btn btn-warning" ng-if="allpay.allow_coupon"  ng-disabled="cartProducts.length==0 || !currentData.orderType" ng-click="actionPay('coupon')">优惠券</button>
+	    <button class="btn btn-warning" ng-if="allpay.allow_tenpay_coupon"  ng-disabled="cartProducts.length==0 || !currentData.orderType" ng-click="actionPay('tenpay_coupon')">电子券</button>
+	    <button class="btn btn-warning" ng-if="allpay.allow_cash"  ng-disabled="cartProducts.length==0 || !currentData.orderType" ng-click="actionPay('cash')"  popover="使用现金付款" popover-trigger="mouseenter" popover-placement="top" popover-append-to-body=true popover-popup-delay=500>现金</button>
+	    <button class="btn btn-warning" ng-if="allpay.allow_card"  ng-disabled="cartProducts.length==0 || !currentData.orderType" ng-click="actionPay('card')"  popover="使用银行卡付款" popover-trigger="mouseenter" popover-placement="top" popover-append-to-body=true popover-popup-delay=500>银行卡</button>
+	    <button class="btn btn-warning" ng-if="allpay.allow_mypay"  ng-disabled="cartProducts.length==0 || !currentData.orderType" ng-click="actionPay('mypay')" popover="使用会员卡付款" popover-trigger="mouseenter" popover-placement="top" popover-append-to-body=true popover-popup-delay=500>会员卡</button>
+	    <button class="btn btn-warning" ng-disabled="cartProducts.length==0 || !currentData.orderType" ng-click="actionPay('skip')" popover="直接提交订单，消费后付款" popover-trigger="mouseenter" popover-placement="top" popover-append-to-body=true popover-popup-delay=500>吃完付</button>
+	    <button class="btn btn-warning" ng-if="allpay.allow_own"  ng-disabled="cartProducts.length==0 || !currentData.orderType" ng-click="actionPay('own')">签单</button>
+	    <button class="btn btn-warning"  ng-disabled="cartProducts.length==0 || !currentData.orderType" ng-click="action_pay_others()">其它</button>
+	</div>
+    </div>
+
+    <div class="show pull-right">
+	
+	<div ng-if="show.product">
+	    <div class="show-categ">
+		<!-- 分类 -->
+		<button class="btn btn-success"  style="font-size:2rem" ng-click="actionPCateg()">全部</button>
+		<span ng-repeat="categ in pcategs |orderBy :'seq'">
+		    <button class="btn btn-success" ng-click="actionPCateg(categ.id)"  style="font-size:2rem">{{categ.name}}</button>
+		</span>
+	    </div>
+
+	    <div class="show-product">
+		<!--菜品-->
+		<div class="no-product text-center" ng-if="tempProducts.length==0">该品类下还没有商品!</div> 
+		<span ng-repeat="product in tempProducts">
+		    <button class="btn btn-info" ng-click="actionProduct(product)">
+			<span style="font-size:1.8rem;font-weight:bold">{{product.name}}</span>
+			<br/>
+			<i>{{product.price | currency:'￥'}}</i>
+		    </button>
+		</span>
+	    </div>
+	    
+	    <div class="show-flavour">
+		<!-- 口味 -->
+		<button class="btn btn-info" ng-click="removeTreat()">
+		    <span>去除做法</span>
+		</button>
+		<span ng-repeat="treatGroup in tempPtreats" class="col-xs-offset-1">
+		    <span ng-repeat="oneTreat in treatGroup.lines">
+			<button class="btn btn-info" ng-disabled="cartProducts.length==0" ng-click="actionTreat(oneTreat)">
+			    <span>{{oneTreat}}</span>
+			</button>
+		    </span>
+		</span>
+	    </div>
+	    
+	</div>
+	
+	<div ng-if="show.orderPool" class="show-pool">
+	    <div class="close-pool">
+		<button class="btn btn-success" ng-click="actionClosePoolOrder()">
+		    暂不取单
+		    <span class="glyphicon glyphicon-remove"></span>
+		</button>
+	    </div>
+	    <div ng-repeat="oneOrder in poolOrder">
+		<table st-table="oneOrder" class="table table-bordered">
+		    <thead>
+			<tr>
+			    <th>品名</th>
+			    <th>单价</th>
+			    <th>数量</th>
+			    <th>做法</th>
+			    <th>折扣</th>
+			    <th>
+				<button class="btn btn-xs btn-success" ng-click="actionDoPullOrder($index)">
+				    <span class="glyphicon glyphicon-ok"></span>
+				</button>
+			    </th>
+			</tr>
+		    </thead>
+		    <tbody>
+			<tr ng-repeat="product in oneOrder">
+			    <td>{{product.name}}</td>
+			    <td>{{product.price | currency:'￥'}}</td>
+			    <td>{{product.qty}}</td>
+			    <td>{{product.treat}}</td>
+			    <td>{{product.discount}}</td>
+			    <td/>
+			</tr>
+		    </tbody>
+		</table>
+	    </div>
+	</div>
+	
+	<div ng-if="show.sold" class="show-sold">
+	    <div class="op-sold">
+		<div class="form-inline">
+		    <input type="text" class="form-control" ng-model="search.ordername" placeholder="单号" style="width:150px"/>
+		    <button class="btn btn-info" ng-click="searchOrder(search.ordername)">按单查找</button>
+		    <input type="text" class="form-control" ng-model="search.ordermark" placeholder="牌号" style="width:150px"/>
+		    <button class="btn btn-info" ng-click="searchOrderMark(search.ordermark)">按牌查找</button>
+		    <button class="btn btn-info" ng-click="searchShowOrderTable()">按桌查找</button>
+		    <button class="btn btn-warning" ng-click="actionCloseSold()">关闭</button>
+		</div>
+
+		<div ng-if="searchOrderTableShow"  class="show-order-table">
+		    <span ng-repeat="one_table in tables">
+			<button class="btn btn-success" ng-click="searchOrderTable(one_table.id)">
+			    <span style="font-size:2rem">
+				{{one_table.name}}
+			    </span>
+			</button>
+		    </span>
+		    <button class="btn btn-warning" ng-click="searchCancelShowOrderTable()">
+			<span style="font-size:2rem">
+			    关闭
+			    <span class="glyphicon glyphicon-remove"></span>
+			</span>
+		    </button>
+		</div>
+		
+	    </div>
+	    
+	    <div ng-repeat="oneLastOrder in tempLastOrderData | orderBy:'-create_date'" style="border-bottom:0.1rem dotted red;padding-top:2rem">
+		<div class="table-title text-center">
+		    编号:&nbsp; {{oneLastOrder.name}} ({{oneLastOrder.state | order_state}})
+		    
+		    <div style="margin-top:1rem;font-weight:normal;font-size:1rem">
+			<div>
+			    <span ng-if="oneLastOrder.has_pay">已收款, 实收金额{{oneLastOrder.money_pay | currency:'￥'}} &nbsp; &nbsp;</span>
+			    <span ng-if="!oneLastOrder.has_pay">未收款 &nbsp; &nbsp;</span>
+			    <span>订单金额{{oneLastOrder.totalMoney | currency:'￥'}}</span>
+			    <button class="btn btn-xs btn-info" ng-if="oneLastOrder.state=='confirm' && !oneLastOrder.has_return" ng-click="actionCancelSold(oneLastOrder.id)">退单</button>
+			</div>
+			<div>
+			    <span> {{oneLastOrder.order_type | order_type}}</span>
+			    <span ng-if="oneLastOrder.mark_no">牌号: {{oneLastOrder.mark_no}}</span>
+			    <span ng-if="oneLastOrder.table_id">餐桌: {{oneLastOrder.table_id | oneFilter:tables}}</span>
+			</div>
+		    </div>
+		    <button class="btn btn-info btn-xs" ng-if="show.cashbox" ng-click="printOrder(oneLastOrder)">打印</button>
+		</div>
+		<div ng-repeat = "pay in oneLastOrder.pays" style="padding:0.1rem; margin:0.1rem">
+		    <div ng-if="pay.qty>=0">{{pay.pay_type|pay_type}}: {{pay.qty | currency:"￥"}}</div>
+		    <div ng-if="pay.qty<0">{{pay.pay_type|pay_type}}: 退{{-pay.qty | currency:"￥"}}</div>
+		</div>
+		
+		<table st-table="oneLastOrder.lines" class="table">
+		    <thead>
+			<tr>
+			    <th>品名</th>
+			    <th>单价</th>
+			    <th>数量</th>
+			    <th>折扣</th>
+			    <th>备菜</th>
+			    <th>出品</th>
+			    <th>取消</th>
+			    <th>退品</th>
+			    <th/>
+			</tr>
+		    </thead>
+		    <tbody>
+			<tr ng-repeat="product in oneLastOrder.lines">
+			    <td>{{product.name}}</td>
+			    <td>{{product.price | currency:'￥'}}</td>
+			    <td>{{product.qty}}</td>
+			    <td><span ng-if="product.discount !==100">{{product.discount}}</span></td>
+			    <td>{{product.prepare_qty}}</td>
+			    <td>{{product.done_qty}}</td>
+			    <td>
+				{{product.cancel_qty}}
+			    </td>
+			    <td>
+				{{product.return_qty}}
+			    </td>
+			    <td>
+				<button class="btn btn-xs btn-info" ng-if="product.qty-product.cancel_qty-product.return_qty>0" ng-click="actionCancelSoldOne(oneLastOrder, product)">退品</button>
+			    </td>
+			</tr>
+		    </tbody>
+		</table>
+	    </div>
+	</div>
+
+	<div ng-if="show.personQty" class="show-mark">
+	    <form role="form" class="form-inline" name="person_qtyForm">
+		<div class="form-group" >
+		    <label for="person_qty">人数: </label>
+		    <input type="text" class="form-control" id="person_qty" ng-model="tempPersonQty"/>
+		    <br/>
+		    <div class="numpad">
+			<button class="input-button"  ko-key="1" ko-input="tempPersonQty">1</button>
+			<button class="input-button"  ko-key="2" ko-input="tempPersonQty">2</button>
+			<button class="input-button" ko-key="3" ko-input="tempPersonQty">3</button>
+			<button class="mode-button" ko-key="del" ko-input="tempPersonQty">
+			    <img src="/static/images/backspace.png" width="24" height="21" />
+			</button>
+			<br/>
+			<button class="input-button" ko-key="4" ko-input="tempPersonQty">4</button>
+			<button class="input-button" ko-key="5" ko-input="tempPersonQty">5</button>
+			<button class="input-button" ko-key="6" ko-input="tempPersonQty">6</button>
+			<button class="mode-button" ko-key="-" ko-input="tempPersonQty">+/-</button>
+			<br/>
+			<button class="input-button" ko-key="7" ko-input="tempPersonQty">7</button>
+			<button class="input-button" ko-key="8" ko-input="tempPersonQty">8</button>
+			<button class="input-button" ko-key="9" ko-input="tempPersonQty">9</button>
+			<button class="mode-button" ng-click="actionPersonQtyOk(tempPersonQty)">确认</button>
+			<br/>
+			<button class="input-button" ko-key="0" ko-input="tempPersonQty">0</button>
+			<button class="input-button" ko-key="00" ko-input="tempPersonQty">00</button>
+			<button class="input-button" ko-key="." ko-input="tempPersonQty">.</button>
+			<button class="mode-button" ng-click="actionPersonQtyCancel()">取消</button>
+			<br/>
+		    </div>
+		</div>
+	    </form>
+	</div>
+
+	
+	<div ng-if="show.orderMarkNo" class="show-mark">
+	    <form role="form" class="form-inline" name="mark_noForm">
+		<div class="form-group" >
+		    <label for="mark_no">牌号: </label>
+		    <input type="text" class="form-control" id="mark_no" ng-model="tempMarkNo"/>
+		    <br/>
+		    <div class="numpad">
+			<button class="input-button"  ko-key="1" ko-input="tempMarkNo">1</button>
+			<button class="input-button"  ko-key="2" ko-input="tempMarkNo">2</button>
+			<button class="input-button" ko-key="3" ko-input="tempMarkNo">3</button>
+			<button class="mode-button" ko-key="del" ko-input="tempMarkNo">
+			    <img src="/static/images/backspace.png" width="24" height="21" />
+			</button>
+			<br/>
+			<button class="input-button" ko-key="4" ko-input="tempMarkNo">4</button>
+			<button class="input-button" ko-key="5" ko-input="tempMarkNo">5</button>
+			<button class="input-button" ko-key="6" ko-input="tempMarkNo">6</button>
+			<button class="mode-button" ko-key="-" ko-input="tempMarkNo">+/-</button>
+			<br/>
+			<button class="input-button" ko-key="7" ko-input="tempMarkNo">7</button>
+			<button class="input-button" ko-key="8" ko-input="tempMarkNo">8</button>
+			<button class="input-button" ko-key="9" ko-input="tempMarkNo">9</button>
+			<button class="mode-button" ng-click="actionMarkNoOk(tempMarkNo)">现金支付</button>
+			<br/>
+			<button class="input-button" ko-key="0" ko-input="tempMarkNo">0</button>
+			<button class="input-button" ko-key="00" ko-input="tempMarkNo">00</button>
+			<button class="input-button" ko-key="." ko-input="tempMarkNo">.</button>
+			<button class="mode-button" ng-click="actionMarkNoCancel()">取消</button>
+			<br/>
+		    </div>
+		</div>
+	    </form>
+	</div>
+	
+	<div ng-if="show.orderTableNo"  class="show-order-table">
+	    <span ng-repeat="one_table in tables">
+		<button class="btn btn-success" ng-click="actionTableNoOk(one_table)">
+		    <span style="font-size:2rem">
+			{{one_table.name}}
+		    </span>
+		</button>
+	    </span>
+	    <button class="btn btn-warning" ng-click="actionTableNoCancel()">
+		<span style="font-size:2rem">
+		    取消
+		    <span class="glyphicon glyphicon-remove"></span>
+		</span>
+	    </button>
+	</div>
+
+	<div ng-if="show.orderOut"  class="show-order-out" >
+	    <div class="question">确认外带?</div>
+	    <button class="btn btn-success" ng-click="actionOutOk()">
+		确认 
+		<span class="glyphicon glyphicon-ok"></span>
+	    </button>
+	    <button class="btn btn-warning" ng-click="actionOutCancel()">
+		取消 
+		<span class="glyphicon glyphicon-remove"></span>
+	    </button>
+	</div>
+
+	<div ng-if="show.orderAddress" class="show-order-address">
+	    <form role="form" name="addressForm">
+		<div class="input-group add-margin" style="margin:1rem 0">
+		    <span class="input-group-addon" id="address_address">地址</span>
+		    <input type="text" class="form-control" ng-model="address.address"/>
+		</div>
+
+		<div class="input-group add-margin" style="margin:1rem 0">
+		    <span class="input-group-addon" id="address_name">称呼</span>
+		    <input type="text" class="form-control" ng-model="address.name"/>
+		</div>
+
+		<div class="input-group add-margin" style="margin:1rem 0">
+		    <span class="input-group-addon" id="address_tel">电话</span>
+		    <input type="text" class="form-control" ng-model="address.tel"/>
+		    <span class="input-group-btn" id="address_tel" ng-click="actionGetAddressFromTel(address.tel)">
+			<button class="btn btn-default" type="button">匹配 !</button>
+		    </span>
+		</div>
+	    </form>
+
+            <div>
+		<button class="btn btn-default" ng-click="actionRegion()">
+		    周边地址
+		</button>
+		<button class="btn btn-success" ng-disabled="addressForm.$invalid" ng-click="actionAddressOk(address)">
+		    确认
+		    <span class="glyphicon glyphicon-ok"></span>
+		</button>
+		<button class="btn btn-warning" ng-click="actionAddressCancel()">
+		    取消
+		    <span class="glyphicon glyphicon-remove"></span>
+		</button>
+	    </div>
+	    
+	    <div ng-if="hasAddress" style="margin:2rem">
+		<div class="text-left">
+		    <span ng-repeat="one in hasAddress" style="margin:1rem">
+			<button class="btn btn-default" ng-click="actionSetOldAddress(one)" style="font-size:1.2rem; font-weight:bold">{{one.address}}  {{one.name}}</button>
+		    </span>
+		</div>
+	    </div>
+	    
+	    <div ng-if="showRegion" style="margin:3rem 0">
+		<div style="margin:1rem 0">
+		    <span ng-repeat="one in allAddress |orderBy :'seq'">
+			<button class="btn btn-default" ng-click="actionGetAddress(one)"  style="font-size:2rem">{{one.name}}</button>
+		    </span>
+		</div>
+		
+		<div ng-repeat="place in allPlace" class="text-left">
+		    <button class="btn btn-default" ng-click="actionGetPlace(place)">
+			<span style="font-size:1.2rem;font-weight:bold">{{place}}</span>
+		    </button>
+		</div>
+	    </div>
+	</div>
+
+	
+	<div ng-if="show.orderRenew" class="show-order-renew">
+	    <div class="question">请确认补单?</div>
+	    <button class="btn btn-success" ng-click="actionRenewOk()">
+		确认
+		<span class="glyphicon glyphicon-ok"></span>
+	    </button>
+	    <button class="btn btn-warning" ng-click="actionRenewCancel()">
+		取消
+		<span class="glyphicon glyphicon-remove"></span>
+	    </button>
+	</div>
+
+	<div ng-if="show.orderWaste" class="show-order-waste">
+	    <div class="question">请确认丢弃以上商品?</div>
+	    <button class="btn btn-success" ng-click="actionWasteOk()">
+		确认
+		<span class="glyphicon glyphicon-ok"></span>
+	    </button>
+	    <button class="btn btn-warning" ng-click="actionWasteCancel()">
+		取消
+		<span class="glyphicon glyphicon-remove"></span>
+	    </button>
+	</div>
+
+	<div ng-if="show.orderMyeat" class="show-order-myeat">
+	    <div class="question">请确认?</div>
+	    <button class="btn btn-success" ng-click="actionMyeatOk()">
+		确认
+		<span class="glyphicon glyphicon-ok"></span>
+	    </button>
+	    <button class="btn btn-warning" ng-click="actionMyeatCancel()">
+		取消
+		<span class="glyphicon glyphicon-remove"></span>
+	    </button>
+	</div>
+
+	<div ng-if="show.discount" class="show-discount">
+	    <form role="form" class="form-inline">
+		<div class="form-group">
+		    <div class="form-group" >
+			<label for="discount">折扣</label>
+			<input type="text" class="form-control" id="discount" ng-model="tempDiscount"/>
+			<br/>
+			<div class="numpad">
+			    <button class="input-button"  ko-key="1" ko-input="tempDiscount">1</button>
+			    <button class="input-button"  ko-key="2" ko-input="tempDiscount">2</button>
+			    <button class="input-button" ko-key="3" ko-input="tempDiscount">3</button>
+			    <button class="mode-button" ko-key="del" ko-input="tempDiscount">
+				<img src="/static/images/backspace.png" width="24" height="21" />
+			    </button>
+			    <br/>
+			    <button class="input-button" ko-key="4" ko-input="tempDiscount">4</button>
+			    <button class="input-button" ko-key="5" ko-input="tempDiscount">5</button>
+			    <button class="input-button" ko-key="6" ko-input="tempDiscount">6</button>
+			    <button class="mode-button" ng-click="actionDiscountOkAll(tempDiscount)">全部折扣</button>
+			    <br/>
+			    <button class="input-button" ko-key="7" ko-input="tempDiscount">7</button>
+			    <button class="input-button" ko-key="8" ko-input="tempDiscount">8</button>
+			    <button class="input-button" ko-key="9" ko-input="tempDiscount">9</button>
+			    <button class="mode-button" ng-click="actionDiscountOk(tempDiscount)">单品折扣</button>
+			    <br/>
+			    <button class="input-button" ko-key="0" ko-input="tempDiscount">0</button>
+			    <button class="input-button" ko-key="00" ko-input="tempDiscount">00</button>
+			    <button class="input-button" ko-key="." ko-input="tempDiscount">.</button>
+			    <button class="mode-button" ng-click="actionDiscountCancel()">取消</button>
+			    <br/>
+			</div>
+		    </div>
+		</div>
+	    </form>
+	</div>
+
+	<!-- 需考虑合并支付 -->
+	<div ng-if="show.pay" class="show-pay">
+	    <div class="order-total">
+		<div>
+		    该订单总金额: {{cartMoney | currency:"￥"}}
+		    <span ng-if="show.pay_cash" class="money-extra">
+			&nbsp;&nbsp;
+			<span ng-if="money.left<0">找零:{{-money.left | currency:'￥'}}</span>
+			<span ng-if="money.left>=0">还差:{{money.left | currency:'￥'}}</span>
+		    </span>
+		</div>
+		<textarea class="form-control" rows="2" cols="4" ng-model="currentData.note" placeholder="备注" style="margin:1rem auto">
+		</textarea>
+	    </div>
+
+	    <div ng-if="show.pay_coupon"  class="show-pay-coupon">
+		<!-- <label for="pay_coupon">优惠券编号</label> -->
+		<!-- <input type="text" class="form-control" id="pay_coupon" ng-model="couponName"/> -->
+		<br/>
+		<form role="form" class="form-inline" name="couponForm">
+		    <div class="form-group" >
+			<label for="pay_coupon">优惠券支付金额</label>
+			<input type="text" class="form-control" id="pay_coupon" ng-model="temp.coupon"/>
+			<br/>
+			<div class="numpad" ng-show="couponInput">
+			    <button class="input-button"  ko-key="1" ko-input="temp.coupon">1</button>
+			    <button class="input-button"  ko-key="2" ko-input="temp.coupon">2</button>
+			    <button class="input-button" ko-key="3" ko-input="temp.coupon">3</button>
+			    <button class="mode-button" ko-key="del" ko-input="temp.coupon">
+				<img src="/static/images/backspace.png" width="24" height="21" />
+			    </button>
+			    <br/>
+			    <button class="input-button" ko-key="4" ko-input="temp.coupon">4</button>
+			    <button class="input-button" ko-key="5" ko-input="temp.coupon">5</button>
+			    <button class="input-button" ko-key="6" ko-input="temp.coupon">6</button>
+			    <button class="mode-button" ng-click="closeCouponInput()">继续支付</button>
+			    <br/>
+			    <button class="input-button" ko-key="7" ko-input="temp.coupon">7</button>
+			    <button class="input-button" ko-key="8" ko-input="temp.coupon">8</button>
+			    <button class="input-button" ko-key="9" ko-input="temp.coupon">9</button>
+			    <button class="mode-button"  ng-disabled="paying" ng-click="actionPayOk()">提交订单</button>
+			    <br/>
+			    <button class="input-button" ko-key="0" ko-input="temp.coupon">0</button>
+			    <button class="input-button" ko-key="00" ko-input="temp.coupon">00</button>
+			    <button class="input-button" ko-key="." ko-input="temp.coupon">.</button>
+			    <button class="mode-button" ng-click="actionPayCancel()">取消支付</button>
+			    <br/>
+			</div>
+		    </div>
+		</form>
+	    </div>
+
+
+	    <div ng-if="show.pay_tenpay_coupon"  class="show-pay-coupon">
+		<!-- <label for="pay_coupon">优惠券编号</label> -->
+		<!-- <input type="text" class="form-control" id="pay_coupon" ng-model="couponName"/> -->
+		<br/>
+		<form role="form" class="form-inline" name="tenpaycouponForm">
+		    <div class="form-group" >
+			<label for="pay_tenpaycoupon">微信优惠券支付金额</label>
+			<input type="text" class="form-control" id="pay_tenpaycoupon" ng-model="temp.tenpaycoupon"/>
+			<br/>
+			<div class="numpad" ng-show="tenpaycouponInput">
+			    <button class="input-button"  ko-key="1" ko-input="temp.tenpaycoupon">1</button>
+			    <button class="input-button"  ko-key="2" ko-input="temp.tenpaycoupon">2</button>
+			    <button class="input-button" ko-key="3" ko-input="temp.tenpaycoupon">3</button>
+			    <button class="mode-button" ko-key="del" ko-input="temp.tenpaycoupon">
+				<img src="/static/images/backspace.png" width="24" height="21" />
+			    </button>
+			    <br/>
+			    <button class="input-button" ko-key="4" ko-input="temp.tenpaycoupon">4</button>
+			    <button class="input-button" ko-key="5" ko-input="temp.tenpaycoupon">5</button>
+			    <button class="input-button" ko-key="6" ko-input="temp.tenpaycoupon">6</button>
+			    <button class="mode-button" ng-click="closeTenpayCouponInput()">继续支付</button>
+			    <br/>
+			    <button class="input-button" ko-key="7" ko-input="temp.tenpaycoupon">7</button>
+			    <button class="input-button" ko-key="8" ko-input="temp.tenpaycoupon">8</button>
+			    <button class="input-button" ko-key="9" ko-input="temp.tenpaycoupon">9</button>
+			    <button class="mode-button" ng-disabled="paying" ng-click="actionPayOk()">提交订单</button>
+			    <br/>
+			    <button class="input-button" ko-key="0" ko-input="temp.tenpaycoupon">0</button>
+			    <button class="input-button" ko-key="00" ko-input="temp.tenpaycoupon">00</button>
+			    <button class="input-button" ko-key="." ko-input="temp.tenpaycoupon">.</button>
+			    <button class="mode-button" ng-click="actionPayCancel()">取消支付</button>
+			    <br/>
+			</div>
+		    </div>
+		</form>
+	    </div>
+
+	    
+	    <div  ng-if="show.pay_cash" class="show-pay-cash">
+		<form role="form" class="form-inline" name="cashForm">
+		    <div class="form-group" >
+			<label for="pay_cash">现金支付金额</label>
+			<input type="text" class="form-control" id="pay_cash" ng-model="temp.cash"/>
+			<br/>
+			<div class="numpad" ng-show="cashInput">
+			    <button class="input-button"  ko-key="1" ko-input="temp.cash">1</button>
+			    <button class="input-button"  ko-key="2" ko-input="temp.cash">2</button>
+			    <button class="input-button" ko-key="3" ko-input="temp.cash">3</button>
+			    <button class="mode-button" ko-key="del" ko-input="temp.cash">
+				<img src="/static/images/backspace.png" width="24" height="21" />
+			    </button>
+			    <button class="input-button" style="color:red" ko-key="20" ko-input="temp.cash">20</button>
+			    <br/>
+			    <button class="input-button" ko-key="4" ko-input="temp.cash">4</button>
+			    <button class="input-button" ko-key="5" ko-input="temp.cash">5</button>
+			    <button class="input-button" ko-key="6" ko-input="temp.cash">6</button>
+			    <button class="mode-button" ng-click="closeCashInput()">继续支付</button>
+			    <button class="input-button"  style="color:red" ko-key="50" ko-input="temp.cash">50</button>
+			    <br/>
+			    <button class="input-button" ko-key="7" ko-input="temp.cash">7</button>
+			    <button class="input-button" ko-key="8" ko-input="temp.cash">8</button>
+			    <button class="input-button" ko-key="9" ko-input="temp.cash">9</button>
+			    <button class="mode-button" ng-disabled="paying" ng-click="actionPayOk()">提交订单</button>
+			    <button class="input-button"  style="color:red" ko-key="100" ko-input="temp.cash">100</button>
+			    <br/>
+			    <button class="input-button" ko-key="0" ko-input="temp.cash">0</button>
+			    <button class="input-button" ko-key="00" ko-input="temp.cash">00</button>
+			    <button class="input-button" ko-key="." ko-input="temp.cash">.</button>
+			    <button class="mode-button" ng-click="actionPayCancel()">取消支付</button>
+			    <button class="input-button"  style="color:red" ko-key="200" ko-input="temp.cash">200</button>
+			    <br/>
+			</div>
+		    </div>
+		</form>
+	    </div>
+
+	    <div  ng-if="show.pay_card" class="show-pay-card">
+		<form role="form" class="form-inline" name="cardForm">
+		    <div class="form-group" >
+			<label for="pay_card">银行卡支付金额</label>
+			<input type="text" class="form-control" id="pay_card" ng-model="temp.card"/>
+			<br/>
+			<div class="numpad" ng-show="cardInput">
+			    <button class="input-button"  ko-key="1" ko-input="temp.card">1</button>
+			    <button class="input-button"  ko-key="2" ko-input="temp.card">2</button>
+			    <button class="input-button" ko-key="3" ko-input="temp.card">3</button>
+			    <button class="mode-button" ko-key="del" ko-input="temp.card">
+				<img src="/static/images/backspace.png" width="24" height="21" />
+			    </button>
+			    <br/>
+			    <button class="input-button" ko-key="4" ko-input="temp.card">4</button>
+			    <button class="input-button" ko-key="5" ko-input="temp.card">5</button>
+			    <button class="input-button" ko-key="6" ko-input="temp.card">6</button>
+			    <button class="mode-button" ng-click="closeCashInput()">继续支付</button>
+			    <br/>
+			    <button class="input-button" ko-key="7" ko-input="temp.card">7</button>
+			    <button class="input-button" ko-key="8" ko-input="temp.card">8</button>
+			    <button class="input-button" ko-key="9" ko-input="temp.card">9</button>
+			    <button class="mode-button" ng-disabled="paying" ng-click="actionPayOk()">提交订单</button>
+			    <br/>
+			    <button class="input-button" ko-key="0" ko-input="temp.card">0</button>
+			    <button class="input-button" ko-key="00" ko-input="temp.card">00</button>
+			    <button class="input-button" ko-key="." ko-input="temp.card">.</button>
+			    <button class="mode-button" ng-click="actionPayCancel()">取消支付</button>
+			    <br/>
+			</div>
+		    </div>
+		</form>
+	    </div>
+
+	    <div  ng-if="show.pay_mypay" class="show-pay-mypay">
+		<form role="form" class="form-inline" name="mypayForm">
+		    <div class="form-group" >
+
+			<label for="pay_mypay">充值卡支付金额</label>
+			卡号<input type="text" class="form-control" ng-model="mypay.name"/>  
+
+			<!-- <button class="btn btn-primary" ng-click="actionMypayRest()">查看</button>   -->
+			<!-- <div ng-if="show.mypayRest">余额{{mypay.rest | currency:'￥'}}</div> -->
+			<br/>
+			<div>支付金额<input type="text" class="form-control" id="pay_mypay_qty" ng-model="temp.mypay"/></div>
+			<div>支付密码<input type="text" class="form-control" id="pay_mypay_pwd" ng-model="mypay.passwd"/></div>
+			<!-- 密码需由密码器支付，不需要另外键盘 -->
+			<br/>
+			<div class="numpad" ng-show="mypayInput">
+			    <button class="input-button"  ko-key="1" ko-input="temp.mypay">1</button>
+			    <button class="input-button"  ko-key="2" ko-input="temp.mypay">2</button>
+			    <button class="input-button" ko-key="3" ko-input="temp.mypay">3</button>
+			    <button class="mode-button" ko-key="del" ko-input="temp.mypay">
+				<img src="/static/images/backspace.png" width="24" height="21" />
+			    </button>
+			    <br/>
+			    <button class="input-button" ko-key="4" ko-input="temp.mypay">4</button>
+			    <button class="input-button" ko-key="5" ko-input="temp.mypay">5</button>
+			    <button class="input-button" ko-key="6" ko-input="temp.mypay">6</button>
+			    <button class="mode-button" ng-click="closeMypayInput()">继续支付</button>
+			    <br/>
+			    <button class="input-button" ko-key="7" ko-input="temp.mypay">7</button>
+			    <button class="input-button" ko-key="8" ko-input="temp.mypay">8</button>
+			    <button class="input-button" ko-key="9" ko-input="temp.mypay">9</button>
+			    <button class="mode-button" ng-disabled="paying" ng-click="actionPayOk()">提交订单</button>
+			    <br/>
+			    <button class="input-button" ko-key="0" ko-input="temp.mypay">0</button>
+			    <button class="input-button" ko-key="00" ko-input="temp.mypay">00</button>
+			    <button class="input-button" ko-key="." ko-input="temp.mypay">.</button>
+			    <button class="mode-button" ng-click="actionPayCancel()">取消支付</button>
+			    <br/>
+			</div>
+		    </div>
+		</form>
+	    </div>
+
+	    <div ng-if="show.paySkip" class="show-pay-skip">
+		<div class="question">确认提交订单并稍后支付?</div>
+		<button class="btn btn-info" ng-click="actionPaySkipOk()">
+		    确认
+		    <span class="glyphicon glyphicon-ok"></span>
+		</button>
+		<button class="btn btn-warning" ng-click="actionPaySkipCancel()">
+		    取消
+		    <span class="glyphicon glyphicon-remove"></span>
+		</button>
+	    </div>
+
+	    <div ng-if="show.pay_own" class="show-pay-own" >
+		<form role="form" class="form-inline" name="ownForm">
+		    <div class="form-group" >
+			<br/>
+			<label for="pay_own">签单支付金额</label>
+			<input type="text" class="form-control" id="pay_own" ng-model="temp.own"/>
+			<br/>
+			<div class="numpad" ng-show="ownInput">
+			    <button class="input-button"  ko-key="1" ko-input="temp.own">1</button>
+			    <button class="input-button"  ko-key="2" ko-input="temp.own">2</button>
+			    <button class="input-button" ko-key="3" ko-input="temp.own">3</button>
+			    <button class="mode-button" ko-key="del" ko-input="temp.own">
+				<img src="/static/images/backspace.png" width="24" height="21" />
+			    </button>
+			    <br/>
+			    <button class="input-button" ko-key="4" ko-input="temp.own">4</button>
+			    <button class="input-button" ko-key="5" ko-input="temp.own">5</button>
+			    <button class="input-button" ko-key="6" ko-input="temp.own">6</button>
+			    <button class="mode-button" ng-click="closeOwnInput()">继续支付</button>
+			    <br/>
+			    <button class="input-button" ko-key="7" ko-input="temp.own">7</button>
+			    <button class="input-button" ko-key="8" ko-input="temp.own">8</button>
+			    <button class="input-button" ko-key="9" ko-input="temp.own">9</button>
+			    <button class="mode-button" ng-disabled="paying" ng-click="actionPayOk()">提交订单</button>
+			    <br/>
+			    <button class="input-button" ko-key="0" ko-input="temp.own">0</button>
+			    <button class="input-button" ko-key="00" ko-input="temp.own">00</button>
+			    <button class="input-button" ko-key="." ko-input="temp.own">.</button>
+			    <button class="mode-button" ng-click="actionPayCancel()">取消支付</button>
+			    <br/>
+			</div>
+		    </div>
+		</form>
+	    </div>
+
+	    <div ng-if="show.pay_gift"  class="show-pay-gift">
+		<form role="form" class="form-inline" name="giftForm">
+		    <div class="form-group" >
+			<br/>
+			<label for="pay_gift">赠送金额</label>
+			<input type="text" class="form-control" id="pay_gift" ng-model="temp.gift"/>
+			<br/>
+			<div class="numpad" ng-show="giftInput">
+			    <button class="input-button"  ko-key="1" ko-input="temp.gift">1</button>
+			    <button class="input-button"  ko-key="2" ko-input="temp.gift">2</button>
+			    <button class="input-button" ko-key="3" ko-input="temp.gift">3</button>
+			    <button class="mode-button" ko-key="del" ko-input="temp.gift">
+				<img src="/static/images/backspace.png" width="24" height="21" />
+			    </button>
+			    <br/>
+			    <button class="input-button" ko-key="4" ko-input="temp.gift">4</button>
+			    <button class="input-button" ko-key="5" ko-input="temp.gift">5</button>
+			    <button class="input-button" ko-key="6" ko-input="temp.gift">6</button>
+			    <button class="mode-button" ng-click="closeGiftInput()">继续支付</button>
+			    <br/>
+			    <button class="input-button" ko-key="7" ko-input="temp.gift">7</button>
+			    <button class="input-button" ko-key="8" ko-input="temp.gift">8</button>
+			    <button class="input-button" ko-key="9" ko-input="temp.gift">9</button>
+			    <button class="mode-button" ng-disabled="paying" ng-click="actionPayOk()" >提交订单</button>
+			    <br/>
+			    <button class="input-button" ko-key="0" ko-input="temp.gift">0</button>
+			    <button class="input-button" ko-key="00" ko-input="temp.gift">00</button>
+			    <button class="input-button" ko-key="." ko-input="temp.gift">.</button>
+			    <button class="mode-button" ng-click="actionPayCancel()">取消支付</button>
+			    <br/>
+			</div>
+		    </div>
+		</form>
+	    </div>
+	</div>
+
+	<script type="text/ng-template" id="action_pay_others.html">
+	    <div class="modal-header">
+		<h3 class="modal-title">其它付款</h3>
+	    </div>
+	    <div class="modal-body">
+		<button class="btn btn-info" ng-click="action_open('gift')">赠送</button>
+	    </div>
+	    <div class="modal-footer">
+		<button class="btn btn-warning" ng-click="action_cancel()">关闭</button>
+	    </div>
+	</script>
+
+	
+	<script type="text/ng-template" id="action_others.html">
+	    <div class="modal-header">
+		<h3 class="modal-title">其它</h3>
+	    </div>
+	    <div class="modal-body">
+		<button class="btn btn-warning" ng-click="actionOpen('renew')">补单</button>
+		<button class="btn btn-warning" ng-click="actionOpen('waste')">丢弃</button>
+		<button class="btn btn-warning" ng-click="actionOpen('myeat')">自用</button>
+	    </div>
+	    <div class="modal-footer">
+		<button class="btn btn-warning" ng-click="actionCancel()">关闭</button>
+	    </div>
+	</script>
+
+
+	<script type="text/ng-template" id="action_others.html">
+	    <div class="modal-header">
+		<h3 class="modal-title">其它</h3>
+	    </div>
+	    <div class="modal-body">
+		<button class="btn btn-warning" ng-click="actionOpen('renew')">补单</button>
+		<button class="btn btn-warning" ng-click="actionOpen('waste')">丢弃</button>
+		<button class="btn btn-warning" ng-click="actionOpen('myeat')">自用</button>
+	    </div>
+	    <div class="modal-footer">
+		<button class="btn btn-warning" ng-click="actionCancel()">关闭</button>
+	    </div>
+	</script>
+
+
+	<script type="text/ng-template" id="action_cancel_sold.html">
+	    <div class="modal-header">
+		<h3 class="modal-title">退单</h3>
+	    </div>
+	    <div class="modal-body">
+		确认退单?
+	    </div>
+	    <div class="modal-footer">
+		<button class="btn btn-warning" ng-click="ok()">确认</button>
+		<button class="btn btn-warning" ng-click="cancel()">取消</button>
+	    </div>
+	</script>
+
+	<script type="text/ng-template" id="action_cancel_sold_one.html">
+	    <div class="modal-header">
+		<h3 class="modal-title">退品</h3>
+	    </div>
+	    <div class="modal-body">
+		<span>
+		    <label for="name" class="control-label">产品</label>
+		    <input class="form-control" type="text" ng-model="cancelProduct.name" id="name" disabled/>
+		</span>
+
+		<span>
+		    <label for="qty" class="control-label">数量</label>
+		    <input class="form-control" type="number" ng-model="cancelProduct.qty" id="qty"/>
+		</span>
+		
+		<span>
+		    <label for="type" class="control-label">退款方式</label>
+		    <select ng-model="cancelProduct.payType" ng-options="payType.name for payType in avail_pays"  class="form-control" id="type">
+		    </select>
+		</span>
+		
+		<span>
+		    <label for="money" class="control-label">退款金额</label>
+		    <input class="form-control" type="number" ng-model="cancelProduct.money" id="money"/>
+		</span>
+
+	    </div>
+	    
+	    <div class="modal-footer">
+		<button class="btn btn-warning" ng-click="ok()">确认</button>
+		<button class="btn btn-warning" ng-click="cancel()">取消</button>
+	    </div>
+	</script>
+
+    </div>
